@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block title %}Delete Driver - PermitPro{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Delete Driver</h1>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="card fade-in">
+            <div class="card-body p-4 text-center">
+                <i class="bi bi-exclamation-triangle text-danger" style="font-size: 4rem;"></i>
+                <h4 class="mt-3">Are you sure?</h4>
+                <p class="text-muted">
+                    You are about to delete driver <strong>{{ driver.full_name }}</strong>.<br>
+                    This action cannot be undone.
+                </p>
+                
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="d-flex gap-2 justify-content-center">
+                        <a href="{% url 'fleet:driver_list' %}" class="btn btn-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-trash me-2"></i>Delete Driver
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

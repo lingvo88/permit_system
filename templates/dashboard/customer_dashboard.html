@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - PermitPro{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Permit Request Dashboard</h1>
+    <p class="subtitle">Welcome back, {{ user.get_full_name|default:user.username }}</p>
+</div>
+
+<!-- Action Buttons -->
+<div class="action-buttons">
+    <a href="{% url 'permits:create' %}" class="btn btn-success">
+        <i class="bi bi-plus-circle me-2"></i>New Submission
+    </a>
+    <a href="{% url 'fleet:list' %}" class="btn btn-primary">
+        <i class="bi bi-truck me-2"></i>Manage Vehicles
+    </a>
+    <a href="{% url 'fleet:driver_list' %}" class="btn btn-primary">
+        <i class="bi bi-people me-2"></i>Manage Drivers
+    </a>
+    <a href="{% url 'company:detail' %}" class="btn btn-primary">
+        <i class="bi bi-building me-2"></i>Manage Company
+    </a>
+</div>
+
+<!-- Stats -->
+<div class="row g-4 mb-4">
+    <div class="col-6 col-lg-3">
+        <div class="stat-card">
+            <div class="stat-value">{{ total_permits }}</div>
+            <div class="stat-label">Total Permits</div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="stat-card">
+            <div class="stat-value" style="color: #f39c12;">{{ pending_permits }}</div>
+            <div class="stat-label">Pending Review</div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="stat-card">
+            <div class="stat-value" style="color: #1a5f7a;">{{ in_progress }}</div>
+            <div class="stat-label">In Progress</div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="stat-card">
+            <div class="stat-value" style="color: #27ae60;">{{ completed }}</div>
+            <div class="stat-label">Completed</div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Permits -->
+<div class="card fade-in">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span><i class="bi bi-file-earmark-text me-2"></i>Recent Permit Requests</span>
+        <a href="{% url 'permits:list' %}" class="btn btn-sm btn-outline-light">View All</a>
+    </div>
+    <div class="card-body p-0">
+        {% if recent_permits %}
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Permit #</th>
+                        <th>Date</th>
+                        <th>Load Description</th>
+                        <th>Origin</th>
+                        <th>Destination</th>
+                        <th>Driver</th>
+                        <th>Unit #</th>
+                        <th>States</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for permit in recent_permits %}
+                    <tr>
+                        <td><strong>#{{ permit.permit_number }}</strong></td>
+                        <td>{{ permit.created_at|date:"m/d/Y" }}</td>
+                        <td>{{ permit.load_description|truncatechars:20 }}</td>
+                        <td>{{ permit.origin_address|truncatechars:15 }}</td>
+                        <td>{{ permit.destination_address|truncatechars:15 }}</td>
+                        <td>{{ permit.driver|default:"-" }}</td>
+                        <td>{{ permit.truck.unit_number|default:"-" }}</td>
+                        <td>
+                            {% if permit.states_list %}
+                            <span class="text-primary fw-bold">{{ permit.states_display|truncatechars:15 }}</span>
+                            {% else %}
+                            -
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="badge badge-{{ permit.status }}">
+                                {{ permit.get_status_display }}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="btn-group btn-group-sm">
+                                <a href="{% url 'permits:copy' permit.id %}" class="btn btn-outline-secondary" title="Copy">
+                                    <i class="bi bi-copy"></i>
+                                </a>
+                                <a href="{% url 'permits:detail' permit.id %}" class="btn btn-primary" title="View">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                {% if permit.status == 'draft' %}
+                                <a href="{% url 'permits:edit' permit.id %}" class="btn btn-outline-secondary" title="Edit">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <a href="{% url 'permits:delete' permit.id %}" class="btn btn-outline-danger" title="Delete">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <i class="bi bi-inbox text-muted" style="font-size: 3rem;"></i>
+            <p class="text-muted mt-3">No permit requests yet.</p>
+            <a href="{% url 'permits:create' %}" class="btn btn-primary">
+                <i class="bi bi-plus-circle me-2"></i>Create Your First Permit
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+

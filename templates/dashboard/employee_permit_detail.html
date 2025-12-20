@@ -1,0 +1,365 @@
+{% extends 'base.html' %}
+
+{% block title %}Permit #{{ permit.permit_number }} - PermitPro{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Permit #{{ permit.permit_number }}</h1>
+    <p class="subtitle">{{ permit.company.name }}</p>
+</div>
+
+<a href="{% url 'dashboard:employee_dashboard' %}" class="btn btn-outline-light mb-4">
+    <i class="bi bi-arrow-left me-2"></i>Back to Dashboard
+</a>
+
+<div class="row g-4">
+    <!-- Left Column - Permit Details -->
+    <div class="col-lg-8">
+        <!-- Company Info -->
+        <div class="card mb-4 fade-in">
+            <div class="card-header bg-info">
+                <i class="bi bi-building me-2"></i>Company Information
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Company:</strong> {{ permit.company.name }}</p>
+                        <p><strong>USDOT:</strong> {{ permit.company.usdot_number }}</p>
+                        <p><strong>FEIN:</strong> {{ permit.company.fein|default:"-" }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Email:</strong> {{ permit.company.email }}</p>
+                        <p><strong>Phone:</strong> {{ permit.company.phone }}</p>
+                        <p><strong>Address:</strong> {{ permit.company.full_address }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Permit Details -->
+        <div class="card mb-4 fade-in">
+            <div class="card-header">
+                <i class="bi bi-file-text me-2"></i>Permit Details
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <p><strong>Load Description:</strong> {{ permit.load_description }}</p>
+                        <p><strong>Origin:</strong> {{ permit.origin_address }}</p>
+                        <p><strong>Destination:</strong> {{ permit.destination_address }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Driver:</strong> {{ permit.driver|default:"-" }}</p>
+                        <p><strong>Truck:</strong> {{ permit.truck|default:"-" }}</p>
+                        <p><strong>Trailer:</strong> {{ permit.trailer|default:"-" }}</p>
+                    </div>
+                </div>
+                
+                <hr>
+                
+                <h6 class="mb-3">Dimensions</h6>
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <p><strong>Length:</strong> {{ permit.overall_length_ft }}' {{ permit.overall_length_in }}"</p>
+                    </div>
+                    <div class="col-md-4">
+                        <p><strong>Width:</strong> {{ permit.overall_width_ft }}' {{ permit.overall_width_in }}"</p>
+                    </div>
+                    <div class="col-md-4">
+                        <p><strong>Height:</strong> {{ permit.overall_height_ft }}' {{ permit.overall_height_in }}"</p>
+                    </div>
+                    <div class="col-md-4">
+                        <p><strong>Gross Weight:</strong> {{ permit.gross_weight|default:0 }} lbs</p>
+                    </div>
+                    <div class="col-md-4">
+                        <p><strong>Axles:</strong> {{ permit.num_axles }}</p>
+                    </div>
+                    <div class="col-md-4">
+                        <p><strong>Legal Weight:</strong> {% if permit.is_legal_weight %}Yes{% else %}No{% endif %}</p>
+                    </div>
+                </div>
+                
+                <hr>
+                
+                <h6 class="mb-3">States</h6>
+                {% if permit.states.all %}
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>State</th>
+                                <th>Travel Date</th>
+                                <th>Route</th>
+                                <th>Comments</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for state in permit.states.all %}
+                            <tr>
+                                <td><span class="badge bg-primary">{{ state.state }}</span></td>
+                                <td>{{ state.travel_date|date:"m/d/Y"|default:"-" }}</td>
+                                <td>{{ state.route|default:"-" }}</td>
+                                <td>{{ state.comments|default:"-" }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted">No states selected.</p>
+                {% endif %}
+                
+                {% if permit.customer_comments %}
+                <hr>
+                <h6 class="mb-2">Customer Comments</h6>
+                <p class="bg-light p-3 rounded">{{ permit.customer_comments }}</p>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Documents -->
+        <div class="card mb-4 fade-in">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-paperclip me-2"></i>Documents</span>
+            </div>
+            <div class="card-body">
+                <!-- Upload Form -->
+                <form method="post" action="{% url 'dashboard:upload_document' permit.id %}" enctype="multipart/form-data" class="mb-4">
+                    {% csrf_token %}
+                    <div class="drop-zone" id="dropZone">
+                        <i class="bi bi-cloud-upload"></i>
+                        <p class="mb-2">Drag and drop files here or click to browse</p>
+                        <input type="file" name="files" id="fileInput" multiple class="d-none">
+                    </div>
+                    <div class="row g-2 mt-2">
+                        <div class="col-md-4">
+                            <select name="document_type" class="form-select">
+                                <option value="permit">Permit</option>
+                                <option value="invoice">Invoice</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <button type="submit" class="btn btn-success">
+                                <i class="bi bi-upload me-2"></i>Upload
+                            </button>
+                        </div>
+                    </div>
+                </form>
+                
+                <!-- Document List -->
+                {% if documents %}
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th>Filename</th>
+                            <th>Type</th>
+                            <th>Uploaded By</th>
+                            <th>Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for doc in documents %}
+                        <tr>
+                            <td><i class="bi bi-file-pdf text-danger me-2"></i>{{ doc.filename }}</td>
+                            <td>{{ doc.get_document_type_display }}</td>
+                            <td>{{ doc.uploaded_by|default:"-" }}</td>
+                            <td>{{ doc.uploaded_at|date:"m/d/Y H:i" }}</td>
+                            <td>
+                                <a href="{% url 'permits:document_download' doc.id %}" class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-download"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p class="text-muted text-center">No documents uploaded yet.</p>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Send Email -->
+        <div class="card mb-4 fade-in">
+            <div class="card-header bg-success text-white">
+                <i class="bi bi-envelope me-2"></i>Send Email to Customer
+            </div>
+            <div class="card-body">
+                <form method="post" action="{% url 'dashboard:send_email' permit.id %}" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label">Recipient Email</label>
+                        <input type="email" name="recipient" class="form-control" value="{{ permit.company.email }}">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Subject</label>
+                        <input type="text" name="subject" class="form-control" value="Regarding Permit #{{ permit.permit_number }}">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Message</label>
+                        <textarea name="message" class="form-control" rows="5" placeholder="Enter your message..."></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Attach Files</label>
+                        <div class="drop-zone" id="emailDropZone">
+                            <i class="bi bi-paperclip"></i>
+                            <p class="mb-2">Drag and drop attachments here</p>
+                            <input type="file" name="attachments" id="emailFileInput" multiple class="d-none">
+                        </div>
+                    </div>
+                    {% if documents %}
+                    <div class="mb-3">
+                        <label class="form-label">Attach Existing Documents</label>
+                        {% for doc in documents %}
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="attach_docs" value="{{ doc.id }}" id="doc{{ doc.id }}">
+                            <label class="form-check-label" for="doc{{ doc.id }}">{{ doc.filename }}</label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    <button type="submit" class="btn btn-success">
+                        <i class="bi bi-send me-2"></i>Send Email
+                    </button>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Comments -->
+        <div class="card fade-in">
+            <div class="card-header">
+                <i class="bi bi-chat-dots me-2"></i>Comments
+            </div>
+            <div class="card-body">
+                <form method="post" action="{% url 'dashboard:add_comment' permit.id %}" class="mb-4">
+                    {% csrf_token %}
+                    <div class="mb-2">
+                        <textarea name="message" class="form-control" rows="3" placeholder="Add a comment..."></textarea>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="is_internal" id="isInternal">
+                            <label class="form-check-label" for="isInternal">
+                                <i class="bi bi-lock me-1"></i>Internal note (not visible to customer)
+                            </label>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-sm">Add Comment</button>
+                    </div>
+                </form>
+                
+                {% if comments %}
+                <div class="comments-list">
+                    {% for comment in comments %}
+                    <div class="border-start border-3 {% if comment.is_internal %}border-warning bg-light{% else %}border-primary{% endif %} ps-3 py-2 mb-3">
+                        <div class="d-flex justify-content-between">
+                            <strong>{{ comment.user.get_full_name|default:comment.user.username }}</strong>
+                            <small class="text-muted">{{ comment.created_at|date:"m/d/Y H:i" }}</small>
+                        </div>
+                        {% if comment.is_internal %}<span class="badge bg-warning text-dark">Internal</span>{% endif %}
+                        <p class="mb-0 mt-1">{{ comment.message }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted text-center">No comments yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Right Column - Status & Actions -->
+    <div class="col-lg-4">
+        <!-- Status Update -->
+        <div class="card mb-4 fade-in">
+            <div class="card-header bg-danger">
+                <i class="bi bi-gear me-2"></i>Manage Permit
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label">Status</label>
+                        {{ form.status }}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Assigned To</label>
+                        {{ form.assigned_to }}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Internal Notes</label>
+                        {{ form.internal_notes }}
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bi bi-check-circle me-2"></i>Update Permit
+                    </button>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Email History -->
+        {% if email_logs %}
+        <div class="card fade-in">
+            <div class="card-header">
+                <i class="bi bi-clock-history me-2"></i>Email History
+            </div>
+            <div class="card-body">
+                {% for log in email_logs %}
+                <div class="border-bottom pb-2 mb-2">
+                    <strong>{{ log.subject }}</strong>
+                    <br><small class="text-muted">To: {{ log.recipient_email }}</small>
+                    <br><small class="text-muted">{{ log.sent_at|date:"m/d/Y H:i" }} by {{ log.sent_by }}</small>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Drag and drop functionality
+function setupDropZone(dropZoneId, fileInputId) {
+    const dropZone = document.getElementById(dropZoneId);
+    const fileInput = document.getElementById(fileInputId);
+    
+    if (!dropZone || !fileInput) return;
+    
+    dropZone.addEventListener('click', () => fileInput.click());
+    
+    dropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropZone.classList.add('dragover');
+    });
+    
+    dropZone.addEventListener('dragleave', () => {
+        dropZone.classList.remove('dragover');
+    });
+    
+    dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('dragover');
+        fileInput.files = e.dataTransfer.files;
+        updateDropZoneText(dropZone, fileInput.files);
+    });
+    
+    fileInput.addEventListener('change', () => {
+        updateDropZoneText(dropZone, fileInput.files);
+    });
+}
+
+function updateDropZoneText(dropZone, files) {
+    const p = dropZone.querySelector('p');
+    if (files.length > 0) {
+        p.textContent = `${files.length} file(s) selected`;
+    }
+}
+
+setupDropZone('dropZone', 'fileInput');
+setupDropZone('emailDropZone', 'emailFileInput');
+</script>
+{% endblock %}
+

@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block title %}Add Payment Method - PermitPro{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Add Payment Method</h1>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="card fade-in">
+            <div class="card-body p-4">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Payment Type</label>
+                        {{ form.payment_type }}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Card Number</label>
+                        {{ form.card_number }}
+                    </div>
+                    
+                    <div class="row g-3 mb-3">
+                        <div class="col-6">
+                            <label class="form-label">Expiry Month</label>
+                            {{ form.expiry_month }}
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label">Expiry Year</label>
+                            {{ form.expiry_year }}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">CVV</label>
+                        {{ form.cvv }}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Nickname (optional)</label>
+                        {{ form.nickname }}
+                    </div>
+                    
+                    <div class="form-check mb-3">
+                        {{ form.is_default }}
+                        <label class="form-check-label" for="id_is_default">Set as default payment method</label>
+                    </div>
+                    
+                    <hr class="my-4">
+                    
+                    <div class="d-flex gap-2 justify-content-end">
+                        <a href="{% url 'company:detail' %}" class="btn btn-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-primary">Add Payment Method</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

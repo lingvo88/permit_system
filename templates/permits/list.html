@@ -1,0 +1,148 @@
+{% extends 'base.html' %}
+
+{% block title %}Permit Requests - PermitPro{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Permit Request Dashboard</h1>
+</div>
+
+<div class="action-buttons">
+    <a href="{% url 'permits:create' %}" class="btn btn-success">
+        <i class="bi bi-plus-circle me-2"></i>New Submission
+    </a>
+    <a href="{% url 'fleet:list' %}" class="btn btn-primary">Manage Vehicles</a>
+    <a href="{% url 'fleet:driver_list' %}" class="btn btn-primary">Manage Drivers</a>
+    <a href="{% url 'company:detail' %}" class="btn btn-primary">Manage Company</a>
+</div>
+
+<!-- Filters -->
+<div class="card mb-4 fade-in">
+    <div class="card-body">
+        <form method="get" class="row g-3 align-items-end">
+            <div class="col-md-5">
+                <input type="text" name="search" class="form-control" 
+                       placeholder="Search by permit #, description, address, driver, dispatcher..." 
+                       value="{{ search }}">
+            </div>
+            <div class="col-md-2">
+                <input type="date" name="date_from" class="form-control" value="{{ date_from }}">
+            </div>
+            <div class="col-md-2">
+                <input type="date" name="date_to" class="form-control" value="{{ date_to }}">
+            </div>
+            <div class="col-md-2">
+                <select name="status" class="form-select">
+                    <option value="">All Statuses</option>
+                    {% for value, label in status_choices %}
+                    <option value="{{ value }}" {% if status_filter == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-1">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="bi bi-search"></i>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Permits Table -->
+<div class="card fade-in">
+    <div class="card-body p-0">
+        {% if permits %}
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Permit #</th>
+                        <th>Date</th>
+                        <th>Load Description</th>
+                        <th>Origin</th>
+                        <th>Destination</th>
+                        <th>Driver</th>
+                        <th>Unit #</th>
+                        <th>States</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for permit in permits %}
+                    <tr>
+                        <td><strong>#{{ permit.permit_number }}</strong></td>
+                        <td>{{ permit.created_at|date:"m/d/Y" }}</td>
+                        <td>{{ permit.load_description|truncatechars:15 }}</td>
+                        <td>{{ permit.origin_address|truncatechars:15 }}</td>
+                        <td>{{ permit.destination_address|truncatechars:15 }}</td>
+                        <td>{{ permit.driver|default:"-" }}</td>
+                        <td>{{ permit.truck.unit_number|default:"-" }}</td>
+                        <td>
+                            {% if permit.states_list %}
+                            <span class="text-primary fw-bold">{{ permit.states_display|truncatechars:12 }}</span>
+                            {% else %}
+                            -
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="badge badge-{{ permit.status }}">
+                                {{ permit.get_status_display }}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="btn-group btn-group-sm">
+                                <a href="{% url 'permits:copy' permit.id %}" class="btn btn-outline-secondary" title="Copy">Copy</a>
+                                <a href="{% url 'permits:detail' permit.id %}" class="btn btn-success" title="View">View</a>
+                                {% if permit.status == 'draft' or permit.status == 'pending' %}
+                                <a href="{% url 'permits:edit' permit.id %}" class="btn btn-outline-secondary" title="Edit">Edit</a>
+                                {% endif %}
+                                {% if permit.status == 'draft' %}
+                                <a href="{% url 'permits:delete' permit.id %}" class="btn btn-outline-danger" title="Delete">Delete</a>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Pagination -->
+        {% if permits.has_other_pages %}
+        <div class="d-flex justify-content-between align-items-center p-3 border-top">
+            <span class="text-muted">Page {{ permits.number }} of {{ permits.paginator.num_pages }}</span>
+            <nav>
+                <ul class="pagination mb-0">
+                    {% if permits.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ permits.previous_page_number }}&search={{ search }}&status={{ status_filter }}&date_from={{ date_from }}&date_to={{ date_to }}">Previous</a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled"><span class="page-link">Previous</span></li>
+                    {% endif %}
+                    
+                    {% if permits.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ permits.next_page_number }}&search={{ search }}&status={{ status_filter }}&date_from={{ date_from }}&date_to={{ date_to }}">Next</a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled"><span class="page-link">Next</span></li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+        {% endif %}
+        {% else %}
+        <div class="text-center py-5">
+            <i class="bi bi-inbox text-muted" style="font-size: 3rem;"></i>
+            <p class="text-muted mt-3">No permit requests found.</p>
+            <a href="{% url 'permits:create' %}" class="btn btn-primary">
+                <i class="bi bi-plus-circle me-2"></i>Create Your First Permit
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+

@@ -1,0 +1,141 @@
+{% extends 'base.html' %}
+
+{% block title %}Register - PermitPro{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Create Your Account</h1>
+    <p class="subtitle">Register your company to start submitting permit requests</p>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card fade-in">
+            <div class="card-body p-4">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <!-- User Information -->
+                    <h5 class="mb-3 pb-2 border-bottom">
+                        <i class="bi bi-person-circle me-2 text-primary"></i>User Information
+                    </h5>
+                    
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label">First Name *</label>
+                            <input type="text" name="first_name" class="form-control" required value="{{ form.first_name.value|default:'' }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Last Name *</label>
+                            <input type="text" name="last_name" class="form-control" required value="{{ form.last_name.value|default:'' }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Username *</label>
+                            <input type="text" name="username" class="form-control" required value="{{ form.username.value|default:'' }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Email *</label>
+                            <input type="email" name="email" class="form-control" required value="{{ form.email.value|default:'' }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Phone *</label>
+                            <input type="tel" name="phone" class="form-control" required value="{{ form.phone.value|default:'' }}">
+                        </div>
+                    </div>
+                    
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label">Password *</label>
+                            <input type="password" name="password1" class="form-control" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Confirm Password *</label>
+                            <input type="password" name="password2" class="form-control" required>
+                        </div>
+                    </div>
+                    
+                    <!-- Company Information -->
+                    <h5 class="mb-3 pb-2 border-bottom">
+                        <i class="bi bi-building me-2 text-primary"></i>Company Information
+                    </h5>
+                    
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label">Carrier Name *</label>
+                            <input type="text" name="company_name" class="form-control" required value="{{ form.company_name.value|default:'' }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Company Email *</label>
+                            <input type="email" name="company_email" class="form-control" required value="{{ form.company_email.value|default:'' }}">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Address *</label>
+                            <input type="text" name="address" class="form-control" required value="{{ form.address.value|default:'' }}">
+                        </div>
+                        <div class="col-md-5">
+                            <label class="form-label">City *</label>
+                            <input type="text" name="city" class="form-control" required value="{{ form.city.value|default:'' }}">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">State *</label>
+                            <input type="text" name="state" class="form-control" maxlength="2" required value="{{ form.state.value|default:'' }}">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Zipcode *</label>
+                            <input type="text" name="zipcode" class="form-control" required value="{{ form.zipcode.value|default:'' }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Company Phone *</label>
+                            <input type="tel" name="company_phone" class="form-control" required value="{{ form.company_phone.value|default:'' }}">
+                        </div>
+                    </div>
+                    
+                    <!-- Business IDs -->
+                    <h5 class="mb-3 pb-2 border-bottom">
+                        <i class="bi bi-card-checklist me-2 text-primary"></i>Business Identifiers
+                    </h5>
+                    
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-4">
+                            <label class="form-label">USDOT Number *</label>
+                            <input type="text" name="usdot_number" class="form-control" required value="{{ form.usdot_number.value|default:'' }}">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">FEIN</label>
+                            <input type="text" name="fein" class="form-control" value="{{ form.fein.value|default:'' }}">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">IFTA Number</label>
+                            <input type="text" name="ifta_number" class="form-control" value="{{ form.ifta_number.value|default:'' }}">
+                        </div>
+                    </div>
+                    
+                    {% if form.errors %}
+                    <div class="alert alert-danger">
+                        <strong>Please correct the errors below:</strong>
+                        <ul class="mb-0 mt-2">
+                            {% for field in form %}
+                                {% for error in field.errors %}
+                                <li>{{ field.label }}: {{ error }}</li>
+                                {% endfor %}
+                            {% endfor %}
+                            {% for error in form.non_field_errors %}
+                            <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="d-flex gap-2 justify-content-end">
+                        <a href="{% url 'accounts:login' %}" class="btn btn-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle me-2"></i>Create Account
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

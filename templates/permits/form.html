@@ -1,0 +1,379 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }} - PermitPro{% endblock %}
+
+{% block extra_css %}
+<style>
+    .us-map-container {
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 1.5rem;
+    }
+    
+    .state-btn {
+        display: inline-block;
+        padding: 0.25rem 0.5rem;
+        margin: 0.125rem;
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+        background: white;
+        cursor: pointer;
+        font-size: 0.75rem;
+        transition: all 0.15s;
+    }
+    
+    .state-btn:hover {
+        border-color: var(--primary);
+    }
+    
+    .state-btn.selected {
+        background: var(--primary);
+        color: white;
+        border-color: var(--primary);
+    }
+    
+    .dimension-group {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+    
+    .dimension-group input {
+        width: 60px !important;
+    }
+    
+    .dimension-group span {
+        color: #6c757d;
+        font-size: 0.875rem;
+    }
+    
+    .state-row {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 0.75rem;
+        margin-bottom: 0.5rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Company Info Banner -->
+<div class="card mb-4 fade-in" style="background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);">
+    <div class="card-header bg-transparent border-0 text-white text-center">
+        <h5 class="mb-0">Company Information</h5>
+    </div>
+    <div class="card-body text-white">
+        <div class="row">
+            <div class="col-md-6">
+                <p class="mb-1"><strong>Carrier Name:</strong> {{ company.name }}</p>
+                <p class="mb-1"><strong>USDOT:</strong> {{ company.usdot_number }}</p>
+                <p class="mb-1"><strong>FEIN:</strong> {{ company.fein|default:"-" }}</p>
+                <p class="mb-1"><strong>IFTA:</strong> {{ company.ifta_number|default:"-" }}</p>
+            </div>
+            <div class="col-md-6">
+                <p class="mb-1"><strong>Address:</strong> {{ company.full_address }}</p>
+                <p class="mb-1"><strong>Phone:</strong> {{ company.phone }}</p>
+                <p class="mb-1"><strong>Company Email:</strong> {{ company.email }}</p>
+            </div>
+        </div>
+        
+        <div class="row mt-3 pt-3 border-top border-light">
+            <div class="col-md-6">
+                <label class="form-label text-white-50">Driver</label>
+                {{ form.driver }}
+            </div>
+            <div class="col-md-6">
+                <label class="form-label text-white-50">Driver Email</label>
+                <input type="text" class="form-control" id="driverEmail" readonly value="-">
+            </div>
+        </div>
+    </div>
+</div>
+
+<form method="post" id="permitForm">
+    {% csrf_token %}
+    
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <!-- Load Info -->
+            <div class="card mb-4 fade-in">
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Payment Method</label>
+                            {{ form.payment_method }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Truck</label>
+                            {{ form.truck }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Trailer</label>
+                            {{ form.trailer }}
+                        </div>
+                    </div>
+                    
+                    <hr>
+                    
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label">Load Description *</label>
+                            {{ form.load_description }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Origin Address *</label>
+                            {{ form.origin_address }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Destination Address *</label>
+                            {{ form.destination_address }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Dimensions -->
+            <div class="card mb-4 fade-in">
+                <div class="card-header">
+                    <i class="bi bi-rulers me-2"></i>Dimensions & Configuration
+                </div>
+                <div class="card-body">
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-4">
+                            <label class="form-label"># of Axles</label>
+                            {{ form.num_axles }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Axle Config</label>
+                            {{ form.axle_configuration }}
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-check mt-4">
+                                {{ form.is_legal_weight }}
+                                <label class="form-check-label" for="id_is_legal_weight">Legal Weight</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Overall Length</label>
+                            <div class="dimension-group">
+                                {{ form.overall_length_ft }}<span>ft</span>
+                                {{ form.overall_length_in }}<span>in</span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Overall Width</label>
+                            <div class="dimension-group">
+                                {{ form.overall_width_ft }}<span>ft</span>
+                                {{ form.overall_width_in }}<span>in</span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Overall Height</label>
+                            <div class="dimension-group">
+                                {{ form.overall_height_ft }}<span>ft</span>
+                                {{ form.overall_height_in }}<span>in</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Front Overhang</label>
+                            <div class="dimension-group">
+                                {{ form.front_overhang_ft }}<span>ft</span>
+                                {{ form.front_overhang_in }}<span>in</span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Rear Overhang</label>
+                            <div class="dimension-group">
+                                {{ form.rear_overhang_ft }}<span>ft</span>
+                                {{ form.rear_overhang_in }}<span>in</span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Gross Weight</label>
+                            <div class="dimension-group">
+                                {{ form.gross_weight }}<span>lbs</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Left Overhang</label>
+                            <div class="dimension-group">
+                                {{ form.left_overhang_ft }}<span>ft</span>
+                                {{ form.left_overhang_in }}<span>in</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Right Overhang</label>
+                            <div class="dimension-group">
+                                {{ form.right_overhang_ft }}<span>ft</span>
+                                {{ form.right_overhang_in }}<span>in</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- State Selection -->
+            <div class="card mb-4 fade-in">
+                <div class="card-header">
+                    <i class="bi bi-map me-2"></i>States Selection
+                </div>
+                <div class="card-body">
+                    <p class="text-muted text-center mb-3">Click on a state to add it to your permit request</p>
+                    
+                    <div class="us-map-container text-center mb-4">
+                        {% for code, name in state_choices %}
+                        <button type="button" class="state-btn" data-state="{{ code }}" title="{{ name }}">{{ code }}</button>
+                        {% endfor %}
+                    </div>
+                    
+                    <div id="selectedStates">
+                        <!-- Selected states will appear here -->
+                    </div>
+                    
+                    <button type="button" class="btn btn-outline-primary btn-sm" id="addStateBtn">
+                        <i class="bi bi-plus-circle me-1"></i>Add State Row
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Comments -->
+            <div class="card mb-4 fade-in">
+                <div class="card-body">
+                    <label class="form-label">Customer Comments</label>
+                    {{ form.customer_comments }}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <div class="card fade-in sticky-top" style="top: 80px;">
+                <div class="card-header">
+                    <i class="bi bi-check-circle me-2"></i>Submit Permit
+                </div>
+                <div class="card-body">
+                    <p class="text-muted small">
+                        Review your information and submit the permit request for processing.
+                    </p>
+                    
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'dashboard:customer_dashboard' %}" class="btn btn-outline-secondary">
+                            Back to Dashboard
+                        </a>
+                        <button type="submit" name="submit" class="btn btn-primary">
+                            <i class="bi bi-send me-2"></i>Submit
+                        </button>
+                        <button type="submit" name="draft" class="btn btn-success">
+                            <i class="bi bi-save me-2"></i>Save as Draft
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const stateChoices = [
+    ['AL', 'Alabama'], ['AK', 'Alaska'], ['AZ', 'Arizona'], ['AR', 'Arkansas'],
+    ['CA', 'California'], ['CO', 'Colorado'], ['CT', 'Connecticut'], ['DE', 'Delaware'],
+    ['FL', 'Florida'], ['GA', 'Georgia'], ['HI', 'Hawaii'], ['ID', 'Idaho'],
+    ['IL', 'Illinois'], ['IN', 'Indiana'], ['IA', 'Iowa'], ['KS', 'Kansas'],
+    ['KY', 'Kentucky'], ['LA', 'Louisiana'], ['ME', 'Maine'], ['MD', 'Maryland'],
+    ['MA', 'Massachusetts'], ['MI', 'Michigan'], ['MN', 'Minnesota'], ['MS', 'Mississippi'],
+    ['MO', 'Missouri'], ['MT', 'Montana'], ['NE', 'Nebraska'], ['NV', 'Nevada'],
+    ['NH', 'New Hampshire'], ['NJ', 'New Jersey'], ['NM', 'New Mexico'], ['NY', 'New York'],
+    ['NC', 'North Carolina'], ['ND', 'North Dakota'], ['OH', 'Ohio'], ['OK', 'Oklahoma'],
+    ['OR', 'Oregon'], ['PA', 'Pennsylvania'], ['RI', 'Rhode Island'], ['SC', 'South Carolina'],
+    ['SD', 'South Dakota'], ['TN', 'Tennessee'], ['TX', 'Texas'], ['UT', 'Utah'],
+    ['VT', 'Vermont'], ['VA', 'Virginia'], ['WA', 'Washington'], ['WV', 'West Virginia'],
+    ['WI', 'Wisconsin'], ['WY', 'Wyoming']
+];
+
+const selectedStatesContainer = document.getElementById('selectedStates');
+let selectedStates = new Set();
+
+// Load existing states if editing
+{% if existing_states %}
+const existingStates = {{ existing_states|safe }};
+existingStates.forEach(s => {
+    addStateRow(s.state, s.travel_date, s.route, s.comments);
+});
+{% endif %}
+
+// State button click handler
+document.querySelectorAll('.state-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const state = this.dataset.state;
+        if (!selectedStates.has(state)) {
+            addStateRow(state);
+            this.classList.add('selected');
+        }
+    });
+});
+
+// Add state button
+document.getElementById('addStateBtn').addEventListener('click', () => {
+    addStateRow('');
+});
+
+function addStateRow(stateCode = '', date = '', route = '', comments = '') {
+    const row = document.createElement('div');
+    row.className = 'state-row d-flex gap-2 align-items-center';
+    row.innerHTML = `
+        <select name="selected_states[]" class="form-select form-select-sm" style="width: 80px;" required>
+            <option value="">--</option>
+            ${stateChoices.map(([code, name]) => 
+                `<option value="${code}" ${code === stateCode ? 'selected' : ''}>${code}</option>`
+            ).join('')}
+        </select>
+        <input type="date" name="state_date_${stateCode}" class="form-control form-control-sm" style="width: 140px;" value="${date || ''}" placeholder="Date">
+        <input type="text" name="state_route_${stateCode}" class="form-control form-control-sm" style="flex: 1;" value="${route}" placeholder="Route">
+        <input type="text" name="state_comments_${stateCode}" class="form-control form-control-sm" style="flex: 1;" value="${comments}" placeholder="Comments">
+        <button type="button" class="btn btn-sm btn-outline-danger remove-state"><i class="bi bi-x"></i></button>
+    `;
+    
+    row.querySelector('.remove-state').addEventListener('click', () => {
+        const select = row.querySelector('select');
+        if (select.value) {
+            document.querySelector(`.state-btn[data-state="${select.value}"]`)?.classList.remove('selected');
+            selectedStates.delete(select.value);
+        }
+        row.remove();
+    });
+    
+    row.querySelector('select').addEventListener('change', function() {
+        // Update name attributes with new state code
+        const newState = this.value;
+        row.querySelector('input[type="date"]').name = `state_date_${newState}`;
+        row.querySelectorAll('input[type="text"]')[0].name = `state_route_${newState}`;
+        row.querySelectorAll('input[type="text"]')[1].name = `state_comments_${newState}`;
+    });
+    
+    selectedStatesContainer.appendChild(row);
+    
+    if (stateCode) {
+        selectedStates.add(stateCode);
+        document.querySelector(`.state-btn[data-state="${stateCode}"]`)?.classList.add('selected');
+    }
+}
+
+// Update driver email when driver changes
+document.getElementById('id_driver')?.addEventListener('change', function() {
+    const option = this.options[this.selectedIndex];
+    document.getElementById('driverEmail').value = option.text.includes('@') ? option.text : '-';
+});
+</script>
+{% endblock %}
+

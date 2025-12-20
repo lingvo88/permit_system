@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ company.name }} - PermitPro{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>{{ company.name }}</h1>
+</div>
+
+<a href="{% url 'dashboard:company_list' %}" class="btn btn-outline-light mb-4">
+    <i class="bi bi-arrow-left me-2"></i>Back to Companies
+</a>
+
+<div class="row g-4">
+    <div class="col-lg-6">
+        <div class="card fade-in">
+            <div class="card-header">
+                <i class="bi bi-building me-2"></i>Company Information
+            </div>
+            <div class="card-body">
+                <table class="table table-borderless">
+                    <tr><th width="150">Carrier Name:</th><td>{{ company.name }}</td></tr>
+                    <tr><th>Email:</th><td>{{ company.email }}</td></tr>
+                    <tr><th>Phone:</th><td>{{ company.phone }}</td></tr>
+                    <tr><th>Address:</th><td>{{ company.full_address }}</td></tr>
+                    <tr><th>USDOT:</th><td>{{ company.usdot_number }}</td></tr>
+                    <tr><th>FEIN:</th><td>{{ company.fein|default:"-" }}</td></tr>
+                    <tr><th>IFTA:</th><td>{{ company.ifta_number|default:"-" }}</td></tr>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-6">
+        <div class="card fade-in">
+            <div class="card-header">
+                <i class="bi bi-people me-2"></i>Drivers ({{ drivers.count }})
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-sm mb-0">
+                    <thead><tr><th>Name</th><th>Email</th><th>Phone</th></tr></thead>
+                    <tbody>
+                        {% for driver in drivers %}
+                        <tr>
+                            <td>{{ driver.full_name }}</td>
+                            <td>{{ driver.email|default:"-" }}</td>
+                            <td>{{ driver.phone|default:"-" }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="3" class="text-muted text-center">No drivers.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mt-2">
+    <div class="col-12">
+        <div class="card fade-in">
+            <div class="card-header">
+                <i class="bi bi-truck me-2"></i>Vehicles ({{ vehicles.count }})
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-sm mb-0">
+                    <thead><tr><th>Unit #</th><th>Type</th><th>Year</th><th>Make</th><th>Plate</th><th>VIN</th></tr></thead>
+                    <tbody>
+                        {% for vehicle in vehicles %}
+                        <tr>
+                            <td><strong>{{ vehicle.unit_number }}</strong></td>
+                            <td>{{ vehicle.get_vehicle_type_display }}</td>
+                            <td>{{ vehicle.year|default:"-" }}</td>
+                            <td>{{ vehicle.make|default:"-" }}</td>
+                            <td>{{ vehicle.plate|default:"-" }}</td>
+                            <td>{{ vehicle.vin|default:"-" }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="6" class="text-muted text-center">No vehicles.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mt-2">
+    <div class="col-12">
+        <div class="card fade-in">
+            <div class="card-header">
+                <i class="bi bi-file-earmark-text me-2"></i>Recent Permits
+            </div>
+            <div class="card-body p-0">
+                <table class="table mb-0">
+                    <thead><tr><th>Permit #</th><th>Date</th><th>Load</th><th>States</th><th>Status</th><th>Actions</th></tr></thead>
+                    <tbody>
+                        {% for permit in permits %}
+                        <tr>
+                            <td><strong>#{{ permit.permit_number }}</strong></td>
+                            <td>{{ permit.created_at|date:"m/d/Y" }}</td>
+                            <td>{{ permit.load_description|truncatechars:30 }}</td>
+                            <td>{{ permit.states_display|truncatechars:15 }}</td>
+                            <td><span class="badge badge-{{ permit.status }}">{{ permit.get_status_display }}</span></td>
+                            <td>
+                                <a href="{% url 'dashboard:employee_permit_detail' permit.id %}" class="btn btn-sm btn-primary">View</a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="6" class="text-muted text-center">No permits.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

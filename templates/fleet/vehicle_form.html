@@ -1,0 +1,160 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }} - PermitPro{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>{{ title }}</h1>
+    <p class="subtitle">Signed in as: {{ request.user.email }}</p>
+</div>
+
+<a href="{% url 'fleet:list' %}" class="btn btn-primary mb-4">
+    <i class="bi bi-arrow-left me-2"></i>Back to Vehicles
+</a>
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card fade-in">
+            <div class="card-body p-4">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label">Vehicle Type *</label>
+                            {{ form.vehicle_type }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Unit Number *</label>
+                            {{ form.unit_number }}
+                        </div>
+                    </div>
+                    
+                    <!-- Axle Configurations -->
+                    <div class="card bg-light mb-4">
+                        <div class="card-body">
+                            <h5 class="text-center mb-4">Axles</h5>
+                            
+                            <div class="row g-4">
+                                <div class="col-md-4 text-center">
+                                    <h6 class="text-primary">Axle Configuration 1</h6>
+                                    <div class="mb-2">
+                                        <label class="form-label"># of Axles</label>
+                                        {{ form.axle_config_1 }}
+                                    </div>
+                                </div>
+                                <div class="col-md-4 text-center">
+                                    <h6 class="text-primary">Axle Configuration 2</h6>
+                                    <div class="mb-2">
+                                        <label class="form-label"># of Axles</label>
+                                        {{ form.axle_config_2 }}
+                                    </div>
+                                </div>
+                                <div class="col-md-4 text-center">
+                                    <h6 class="text-primary">Axle Configuration 3</h6>
+                                    <div class="mb-2">
+                                        <label class="form-label"># of Axles</label>
+                                        {{ form.axle_config_3 }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-4">
+                            <label class="form-label">Year</label>
+                            {{ form.year }}
+                        </div>
+                        <div class="col-md-8">
+                            <label class="form-label">Make</label>
+                            {{ form.make }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Plate</label>
+                            {{ form.plate }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">State</label>
+                            {{ form.plate_state }}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">VIN</label>
+                            {{ form.vin }}
+                        </div>
+                    </div>
+                    
+                    <div class="row g-3 mb-4">
+                        <div class="col-12">
+                            <label class="form-label">Vehicle Length (ft-in)</label>
+                            <div class="d-flex gap-2 align-items-center">
+                                {{ form.length_ft }}
+                                <span>ft</span>
+                                {{ form.length_in }}
+                                <span>in</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="form-label">Registration PDF</label>
+                        <div class="drop-zone" id="dropZone">
+                            <i class="bi bi-file-pdf"></i>
+                            <p class="mb-2">Drop PDF here or <a href="#" onclick="document.getElementById('id_registration_pdf').click(); return false;">choose file</a></p>
+                            <small class="text-muted">PDF files only</small>
+                            {{ form.registration_pdf }}
+                        </div>
+                        {% if vehicle and vehicle.registration_pdf %}
+                        <small class="text-muted">Current: {{ vehicle.registration_pdf.name }}</small>
+                        {% endif %}
+                        <small class="d-block text-muted mt-1">Upload vehicle registration PDF (required)</small>
+                    </div>
+                    
+                    <hr class="my-4">
+                    
+                    <div class="d-flex justify-content-between">
+                        <button type="submit" class="btn btn-success">
+                            <i class="bi bi-check-circle me-2"></i>Save Vehicle
+                        </button>
+                        <a href="{% url 'fleet:list' %}" class="btn btn-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const dropZone = document.getElementById('dropZone');
+const fileInput = document.getElementById('id_registration_pdf');
+
+dropZone.addEventListener('click', () => fileInput.click());
+
+dropZone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    dropZone.classList.add('dragover');
+});
+
+dropZone.addEventListener('dragleave', () => {
+    dropZone.classList.remove('dragover');
+});
+
+dropZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropZone.classList.remove('dragover');
+    if (e.dataTransfer.files.length) {
+        fileInput.files = e.dataTransfer.files;
+        dropZone.querySelector('p').textContent = e.dataTransfer.files[0].name;
+    }
+});
+
+fileInput.addEventListener('change', () => {
+    if (fileInput.files.length) {
+        dropZone.querySelector('p').textContent = fileInput.files[0].name;
+    }
+});
+</script>
+{% endblock %}
+
