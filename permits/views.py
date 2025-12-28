@@ -93,16 +93,21 @@ def permit_create(request):
             permit.save()
             
             # Handle states from POST data
-            states_data = request.POST.getlist('selected_states[]')
-            for state_code in states_data:
-                if state_code:
-                    PermitState.objects.create(
-                        permit=permit,
-                        state=state_code,
-                        travel_date=request.POST.get(f'state_date_{state_code}'),
-                        route=request.POST.get(f'state_route_{state_code}', ''),
-                        comments=request.POST.get(f'state_comments_{state_code}', ''),
-                    )
+states_data = request.POST.getlist('selected_states[]')
+for state_code in states_data:
+    if state_code:
+        # Get the travel date, convert empty string to None
+        travel_date = request.POST.get(f'state_date_{state_code}')
+        if travel_date == '':
+            travel_date = None
+            
+        PermitState.objects.create(
+            permit=permit,
+            state=state_code,
+            travel_date=travel_date,
+            route=request.POST.get(f'state_route_{state_code}', ''),
+            comments=request.POST.get(f'state_comments_{state_code}', ''),
+        )
             
             if permit.status == PermitRequest.Status.PENDING:
                 messages.success(request, f'Permit #{permit.permit_number} submitted successfully.')
