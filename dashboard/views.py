@@ -192,7 +192,7 @@ Best regards,
 
 PermitPro Team
 Big Rig Permits
-Email: permits@bigrigpermits.org
+Email: bigrigpermitsinc@gmail.com
 Phone: (773) 992-0771
 Website: https://bigrigpermits.org
 
