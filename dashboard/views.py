@@ -153,48 +153,15 @@ def employee_permit_detail(request, permit_id):
     employees = User.objects.filter(user_type__in=[User.UserType.EMPLOYEE, User.UserType.ADMIN])
     form.fields['assigned_to'].queryset = employees
     
-    documents = permit.documents.all()
     comments = permit.comments.all()
     email_logs = permit.email_logs.all()[:10]
     
     return render(request, 'dashboard/employee_permit_detail.html', {
         'permit': permit,
         'form': form,
-        'documents': documents,
         'comments': comments,
         'email_logs': email_logs,
     })
-
-
-@login_required
-def upload_document(request, permit_id):
-    """Upload a document to a permit."""
-    
-    if not request.user.is_employee:
-        messages.error(request, 'Access denied.')
-        return redirect('dashboard:index')
-    
-    permit = get_object_or_404(PermitRequest, pk=permit_id)
-    
-    if request.method == 'POST':
-        files = request.FILES.getlist('files')
-        doc_type = request.POST.get('document_type', 'other')
-        
-        for f in files:
-            PermitDocument.objects.create(
-                permit=permit,
-                document_type=doc_type,
-                file=f,
-                filename=f.name,
-                uploaded_by=request.user,
-            )
-        
-        messages.success(request, f'{len(files)} document(s) uploaded.')
-        
-        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-            return JsonResponse({'success': True})
-    
-    return redirect('dashboard:employee_permit_detail', permit_id=permit.id)
 
 
 @login_required
@@ -212,14 +179,28 @@ def send_email(request, permit_id):
         message_body = request.POST.get('message', '')
         recipient = request.POST.get('recipient', permit.company.email)
         
-        if not subject or not message_body:
-            messages.error(request, 'Subject and message are required.')
+        if not subject:
+            messages.error(request, 'Subject.')
             return redirect('dashboard:employee_permit_detail', permit_id=permit.id)
         
         # Create email
+
+        signature = """
+
+---
+Best regards,
+
+PermitPro Team
+Big Rig Permits
+Email: permits@bigrigpermits.org
+Phone: (773) 992-0771
+Website: https://bigrigpermits.org
+
+This is an automated message. Please do not reply directly to this email.
+        """
         email = EmailMessage(
             subject=subject,
-            body=message_body,
+            body=message_body + signature,
             from_email=settings.DEFAULT_FROM_EMAIL,
             to=[recipient],
             reply_to=[request.user.email] if request.user.email else None,
@@ -232,16 +213,7 @@ def send_email(request, permit_id):
         for f in files:
             email.attach(f.name, f.read(), f.content_type)
             attachment_filenames.append(f.name)
-        
-        # Also attach selected existing documents
-        doc_ids = request.POST.getlist('attach_docs')
-        for doc_id in doc_ids:
-            try:
-                doc = PermitDocument.objects.get(pk=doc_id, permit=permit)
-                email.attach(doc.filename, doc.file.read())
-                attachment_filenames.append(doc.filename)
-            except PermitDocument.DoesNotExist:
-                pass
+
         
         try:
             email.send()

@@ -117,70 +117,6 @@
             </div>
         </div>
         
-        <!-- Documents -->
-        <div class="card mb-4 fade-in">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <span><i class="bi bi-paperclip me-2"></i>Documents</span>
-            </div>
-            <div class="card-body">
-                <!-- Upload Form -->
-                <form method="post" action="{% url 'dashboard:upload_document' permit.id %}" enctype="multipart/form-data" class="mb-4">
-                    {% csrf_token %}
-                    <div class="drop-zone" id="dropZone">
-                        <i class="bi bi-cloud-upload"></i>
-                        <p class="mb-2">Drag and drop files here or click to browse</p>
-                        <input type="file" name="files" id="fileInput" multiple class="d-none">
-                    </div>
-                    <div class="row g-2 mt-2">
-                        <div class="col-md-4">
-                            <select name="document_type" class="form-select">
-                                <option value="permit">Permit</option>
-                                <option value="invoice">Invoice</option>
-                                <option value="other">Other</option>
-                            </select>
-                        </div>
-                        <div class="col-md-4">
-                            <button type="submit" class="btn btn-success">
-                                <i class="bi bi-upload me-2"></i>Upload
-                            </button>
-                        </div>
-                    </div>
-                </form>
-                
-                <!-- Document List -->
-                {% if documents %}
-                <table class="table table-sm">
-                    <thead>
-                        <tr>
-                            <th>Filename</th>
-                            <th>Type</th>
-                            <th>Uploaded By</th>
-                            <th>Date</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for doc in documents %}
-                        <tr>
-                            <td><i class="bi bi-file-pdf text-danger me-2"></i>{{ doc.filename }}</td>
-                            <td>{{ doc.get_document_type_display }}</td>
-                            <td>{{ doc.uploaded_by|default:"-" }}</td>
-                            <td>{{ doc.uploaded_at|date:"m/d/Y H:i" }}</td>
-                            <td>
-                                <a href="{% url 'permits:document_download' doc.id %}" class="btn btn-sm btn-outline-primary">
-                                    <i class="bi bi-download"></i>
-                                </a>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-                {% else %}
-                <p class="text-muted text-center">No documents uploaded yet.</p>
-                {% endif %}
-            </div>
-        </div>
-        
         <!-- Send Email -->
         <div class="card mb-4 fade-in">
             <div class="card-header bg-success text-white">
@@ -321,45 +257,164 @@
 
 {% block extra_js %}
 <script>
-// Drag and drop functionality
-function setupDropZone(dropZoneId, fileInputId) {
-    const dropZone = document.getElementById(dropZoneId);
-    const fileInput = document.getElementById(fileInputId);
+document.addEventListener('DOMContentLoaded', function() {
+    // Store files for each input to maintain state
+    const fileStorage = new Map();
     
-    if (!dropZone || !fileInput) return;
+    // Track all drop zones
+    const dropZones = new Set();
     
-    dropZone.addEventListener('click', () => fileInput.click());
-    
-    dropZone.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        dropZone.classList.add('dragover');
-    });
-    
-    dropZone.addEventListener('dragleave', () => {
-        dropZone.classList.remove('dragover');
-    });
-    
-    dropZone.addEventListener('drop', (e) => {
-        e.preventDefault();
-        dropZone.classList.remove('dragover');
-        fileInput.files = e.dataTransfer.files;
-        updateDropZoneText(dropZone, fileInput.files);
-    });
-    
-    fileInput.addEventListener('change', () => {
-        updateDropZoneText(dropZone, fileInput.files);
-    });
-}
-
-function updateDropZoneText(dropZone, files) {
-    const p = dropZone.querySelector('p');
-    if (files.length > 0) {
-        p.textContent = `${files.length} file(s) selected`;
+    // Helper to check if element is within a drop zone
+    function isWithinDropZone(element) {
+        if (!element) return false;
+        if (dropZones.has(element)) return true;
+        if (element.id === 'emailDropZone') return true;
+        return element.closest && element.closest('#emailDropZone');
     }
-}
-
-setupDropZone('dropZone', 'fileInput');
-setupDropZone('emailDropZone', 'emailFileInput');
+    
+    // Prevent browser from opening files when dropped outside drop zones
+    // Always prevent default on dragover to allow drops
+    document.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }, false);
+    
+    // Prevent drop outside drop zones (check in capture phase before drop zones handle it)
+    document.addEventListener('drop', function(e) {
+        // Check if drop is within any drop zone
+        const target = e.target;
+        const isInDropZone = target && (
+            dropZones.has(target) ||
+            target.id === 'emailDropZone' ||
+            (target.closest && target.closest('#emailDropZone'))
+        );
+        
+        // If not in a drop zone, prevent default to stop file opening
+        // If in a drop zone, let the drop zone handler process it
+        if (!isInDropZone) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+    }, true); // Use capture phase to check first
+    
+    // Helper function to get unique file identifier
+    function getFileId(file) {
+        return `${file.name}-${file.size}-${file.lastModified}`;
+    }
+    
+    // Helper function to update file input with stored files
+    function updateFileInput(fileInput, files) {
+        const dataTransfer = new DataTransfer();
+        files.forEach(file => {
+            try {
+                dataTransfer.items.add(file);
+            } catch (e) {
+                // If file already exists or can't be added, skip it
+                console.warn('Could not add file:', file.name);
+            }
+        });
+        fileInput.files = dataTransfer.files;
+    }
+    
+    // Drag and drop functionality
+    function setupDropZone(dropZoneId, fileInputId) {
+        const dropZone = document.getElementById(dropZoneId);
+        const fileInput = document.getElementById(fileInputId);
+        
+        if (!dropZone || !fileInput) return;
+        
+        // Register this drop zone
+        dropZones.add(dropZone);
+        
+        // Initialize storage for this input
+        if (!fileStorage.has(fileInputId)) {
+            fileStorage.set(fileInputId, new Map());
+        }
+        const storedFiles = fileStorage.get(fileInputId);
+        
+        // Load existing files from input if any
+        if (fileInput.files && fileInput.files.length > 0) {
+            Array.from(fileInput.files).forEach(file => {
+                storedFiles.set(getFileId(file), file);
+            });
+        }
+        
+        dropZone.addEventListener('click', () => fileInput.click());
+        
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            dropZone.classList.add('dragover');
+            return false;
+        });
+        
+        dropZone.addEventListener('dragleave', (e) => {
+            // Only remove dragover if actually leaving the drop zone
+            if (!dropZone.contains(e.relatedTarget)) {
+                dropZone.classList.remove('dragover');
+            }
+        });
+        
+        dropZone.addEventListener('drop', (e) => {
+            // CRITICAL: Prevent default FIRST to stop browser from opening files
+            e.preventDefault();
+            e.stopPropagation();
+            e.stopImmediatePropagation();
+            
+            dropZone.classList.remove('dragover');
+            
+            // Only process if files were actually dropped
+            const files = e.dataTransfer.files;
+            if (!files || files.length === 0) {
+                return false;
+            }
+            
+            // Add new files to storage (avoiding duplicates)
+            const newFiles = Array.from(files);
+            newFiles.forEach(file => {
+                const fileId = getFileId(file);
+                storedFiles.set(fileId, file);
+            });
+            
+            // Update file input with all stored files
+            const allFiles = Array.from(storedFiles.values());
+            updateFileInput(fileInput, allFiles);
+            
+            updateDropZoneText(dropZone, fileInput.files);
+            
+            // Ensure default is prevented
+            return false;
+        });
+        
+        fileInput.addEventListener('change', (e) => {
+            // Add files selected via file picker to storage
+            const selectedFiles = Array.from(e.target.files);
+            selectedFiles.forEach(file => {
+                const fileId = getFileId(file);
+                storedFiles.set(fileId, file);
+            });
+            
+            // Update file input with all stored files
+            const allFiles = Array.from(storedFiles.values());
+            updateFileInput(fileInput, allFiles);
+            
+            updateDropZoneText(dropZone, fileInput.files);
+        });
+        
+        // Initial update of text
+        updateDropZoneText(dropZone, fileInput.files);
+    }
+    
+    function updateDropZoneText(dropZone, files) {
+        const p = dropZone.querySelector('p');
+        if (files.length > 0) {
+            p.textContent = `${files.length} file(s) selected`;
+        } else {
+            p.textContent = 'Drag and drop attachments here';
+        }
+    }
+    
+    setupDropZone('emailDropZone', 'emailFileInput');
+});
 </script>
 {% endblock %}
-
