@@ -26,11 +26,16 @@
                         </div>
                     </div>
                     
-                    <div class="mb-4">
+                    <div class="mb-3">
                         <label class="form-label">Password</label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="bi bi-lock"></i></span>
                             <input type="password" name="password" class="form-control" placeholder="Enter password" required>
+                        </div>
+                        <div class="text-end mt-2">
+                            <a href="{% url 'accounts:password_reset' %}" class="text-decoration-none small">
+                                Forgot your password?
+                            </a>
                         </div>
                     </div>
                     
@@ -55,4 +60,3 @@
     </div>
 </div>
 {% endblock %}
-
