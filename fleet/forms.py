@@ -5,26 +5,12 @@ from .models import Vehicle, Driver, AxleConfiguration
 class VehicleForm(forms.ModelForm):
     """Form for adding/editing vehicles."""
     
-    # Axle configuration fields
-    axle_config_1 = forms.IntegerField(
+    # Number of axles field
+    num_axles = forms.IntegerField(
         required=False, 
         min_value=0, 
-        max_value=15,
-        label="Axle Configuration 1 - # of Axles",
-        widget=forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '# of Axles'})
-    )
-    axle_config_2 = forms.IntegerField(
-        required=False, 
-        min_value=0, 
-        max_value=15,
-        label="Axle Configuration 2 - # of Axles",
-        widget=forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '# of Axles'})
-    )
-    axle_config_3 = forms.IntegerField(
-        required=False, 
-        min_value=0, 
-        max_value=15,
-        label="Axle Configuration 3 - # of Axles",
+        max_value=20,
+        label="Number of Axles",
         widget=forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '# of Axles'})
     )
     
@@ -51,32 +37,29 @@ class VehicleForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         
-        # Load existing axle configurations if editing
+        # Load existing axle count if editing
         if self.instance and self.instance.pk:
-            for config in self.instance.axle_configurations.all():
-                field_name = f'axle_config_{config.configuration_number}'
-                if field_name in self.fields:
-                    self.fields[field_name].initial = config.num_axles
+            config = self.instance.axle_configurations.first()
+            if config:
+                self.fields['num_axles'].initial = config.num_axles
     
     def save(self, commit=True):
         vehicle = super().save(commit=commit)
         
         if commit:
-            # Save axle configurations
-            for i in range(1, 4):
-                num_axles = self.cleaned_data.get(f'axle_config_{i}', 0) or 0
-                if num_axles > 0:
-                    AxleConfiguration.objects.update_or_create(
-                        vehicle=vehicle,
-                        configuration_number=i,
-                        defaults={'num_axles': num_axles}
-                    )
-                else:
-                    # Remove configuration if set to 0
-                    AxleConfiguration.objects.filter(
-                        vehicle=vehicle,
-                        configuration_number=i
-                    ).delete()
+            # Save single axle configuration
+            num_axles = self.cleaned_data.get('num_axles', 0) or 0
+            
+            # Delete all existing configurations
+            vehicle.axle_configurations.all().delete()
+            
+            # Create new configuration if axles > 0
+            if num_axles > 0:
+                AxleConfiguration.objects.create(
+                    vehicle=vehicle,
+                    configuration_number=1,
+                    num_axles=num_axles
+                )
         
         return vehicle
 
@@ -99,4 +82,3 @@ class DriverForm(forms.ModelForm):
             'license_state': forms.TextInput(attrs={'class': 'form-control', 'maxlength': '2'}),
             'is_active': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
-

@@ -168,37 +168,37 @@ if not DEBUG:
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Logging configuration
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'formatters': {
-        'verbose': {
-            'format': '{levelname} {asctime} {module} {message}',
-            'style': '{',
-        },
-    },
-    'handlers': {
-        'file': {
-            'level': 'ERROR',
-            'class': 'logging.FileHandler',
-            'filename': '/var/www/permit_system/django_errors.log',
-            'formatter': 'verbose',
-        },
-        'console': {
-            'level': 'ERROR',
-            'class': 'logging.StreamHandler',
-            'formatter': 'verbose',
-        },
-    },
-    'root': {
-        'handlers': ['console', 'file'],
-        'level': 'ERROR',
-    },
-    'loggers': {
-        'django': {
-            'handlers': ['console', 'file'],
-            'level': 'ERROR',
-            'propagate': False,
-        },
-    },
-}
+#LOGGING = {
+#    'version': 1,
+#    'disable_existing_loggers': False,
+#    'formatters': {
+#        'verbose': {
+#            'format': '{levelname} {asctime} {module} {message}',
+#            'style': '{',
+#        },
+#    },
+#    'handlers': {
+#        'file': {
+#            'level': 'ERROR',
+#            'class': 'logging.FileHandler',
+#           'filename': '/var/www/permit_system/django_errors.log',
+#            'formatter': 'verbose',
+#        },
+#        'console': {
+#            'level': 'ERROR',
+#            'class': 'logging.StreamHandler',
+#            'formatter': 'verbose',
+#        },
+#    },
+#    'root': {
+#        'handlers': ['console', 'file'],
+#        'level': 'ERROR',
+#    },
+#    'loggers': {
+#        'django': {
+#            'handlers': ['console', 'file'],
+#            'level': 'ERROR',
+#            'propagate': False,
+#        },
+#    },
+#}

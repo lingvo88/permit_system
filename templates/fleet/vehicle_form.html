@@ -30,34 +30,14 @@
                         </div>
                     </div>
                     
-                    <!-- Axle Configurations -->
-                    <div class="card bg-light mb-4">
-                        <div class="card-body">
-                            <h5 class="text-center mb-4">Axles</h5>
-                            
-                            <div class="row g-4">
-                                <div class="col-md-4 text-center">
-                                    <h6 class="text-primary">Axle Configuration 1</h6>
-                                    <div class="mb-2">
-                                        <label class="form-label"># of Axles</label>
-                                        {{ form.axle_config_1 }}
-                                    </div>
-                                </div>
-                                <div class="col-md-4 text-center">
-                                    <h6 class="text-primary">Axle Configuration 2</h6>
-                                    <div class="mb-2">
-                                        <label class="form-label"># of Axles</label>
-                                        {{ form.axle_config_2 }}
-                                    </div>
-                                </div>
-                                <div class="col-md-4 text-center">
-                                    <h6 class="text-primary">Axle Configuration 3</h6>
-                                    <div class="mb-2">
-                                        <label class="form-label"># of Axles</label>
-                                        {{ form.axle_config_3 }}
-                                    </div>
-                                </div>
-                            </div>
+                    <!-- Number of Axles -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label">Number of Axles</label>
+                            {{ form.num_axles }}
+                            {% if form.num_axles.errors %}
+                                <div class="invalid-feedback d-block">{{ form.num_axles.errors }}</div>
+                            {% endif %}
                         </div>
                     </div>
                     
