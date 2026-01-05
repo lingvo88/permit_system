@@ -236,6 +236,17 @@ This is an automated message. Please do not reply directly to this email.
                     file=f,
                     filename=f.name,
                 )
+                # Automatically change status to completed when email is sent
+            if permit.status != PermitRequest.Status.COMPLETED:
+                permit.status = PermitRequest.Status.COMPLETED
+                permit.completed_at = timezone.now()
+                permit.save()
+                messages.success(request, f'Email sent to {recipient}. Permit status changed to Completed.')
+            else:
+                messages.success(request, f'Email sent to {recipient}')
+                
+        except Exception as e:
+            messages.error(request, f'Failed to send email: {str(e)}')
             
             messages.success(request, f'Email sent to {recipient}')
         except Exception as e:
