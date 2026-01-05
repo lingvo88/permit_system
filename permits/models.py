@@ -41,7 +41,9 @@ class PermitRequest(models.Model):
     )
     
     # Load info
-    load_description = models.CharField(max_length=200)
+    load_description = models.CharField(max_length=200, verbose_name="Object/Load Description")
+    load_make_model = models.CharField(max_length=200, blank=True, verbose_name="Make/Model")
+    load_serial = models.CharField(max_length=200, blank=True, verbose_name="Serial#")
     origin_address = models.CharField(max_length=300)
     destination_address = models.CharField(max_length=300)
     

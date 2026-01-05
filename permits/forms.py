@@ -27,7 +27,8 @@ class PermitRequestForm(forms.ModelForm):
     class Meta:
         model = PermitRequest
         fields = [
-            'load_description', 'origin_address', 'destination_address',
+            'load_description', 'load_make_model', 'load_serial',  # Added new fields here
+            'origin_address', 'destination_address',
             'driver', 'truck', 'trailer', 'payment_method',
             'overall_length_ft', 'overall_length_in',
             'overall_width_ft', 'overall_width_in',
@@ -40,6 +41,9 @@ class PermitRequestForm(forms.ModelForm):
             'customer_comments',
         ]
         widgets = {
+            'load_description': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Object'}),
+            'load_make_model': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Make/Model'}),
+            'load_serial': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Serial#'}),
             'load_description': forms.TextInput(attrs={'class': 'form-control'}),
             'origin_address': forms.TextInput(attrs={'class': 'form-control'}),
             'destination_address': forms.TextInput(attrs={'class': 'form-control'}),

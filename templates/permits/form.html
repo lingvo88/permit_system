@@ -96,130 +96,28 @@
     <div class="row g-4">
         <div class="col-lg-8">
             <!-- Load Info -->
-            <div class="card mb-4 fade-in">
-                <div class="card-body">
-                    <div class="row g-3">
-                        <div class="col-md-4">
-                            <label class="form-label">Payment Method</label>
-                            {{ form.payment_method }}
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Truck</label>
-                            {{ form.truck }}
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Trailer</label>
-                            {{ form.trailer }}
-                        </div>
+                <div class="row g-3">
+                    <div class="col-12">
+                        <label class="form-label">Object *</label>
+                        {{ form.load_description }}
                     </div>
-                    
-                    <hr>
-                    
-                    <div class="row g-3">
-                        <div class="col-12">
-                            <label class="form-label">Load Description *</label>
-                            {{ form.load_description }}
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Origin Address *</label>
-                            {{ form.origin_address }}
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Destination Address *</label>
-                            {{ form.destination_address }}
-                        </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Make/Model</label>
+                        {{ form.load_make_model }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Serial#</label>
+                        {{ form.load_serial }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Origin Address *</label>
+                        {{ form.origin_address }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Destination Address *</label>
+                        {{ form.destination_address }}
                     </div>
                 </div>
-            </div>
-            
-            <!-- Dimensions -->
-            <div class="card mb-4 fade-in">
-                <div class="card-header">
-                    <i class="bi bi-rulers me-2"></i>Dimensions & Configuration
-                </div>
-                <div class="card-body">
-                    <div class="row g-3 mb-4">
-                        <div class="col-md-4">
-                            <label class="form-label"># of Axles</label>
-                            {{ form.num_axles }}
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Axle Config</label>
-                            {{ form.axle_configuration }}
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-check mt-4">
-                                {{ form.is_legal_weight }}
-                                <label class="form-check-label" for="id_is_legal_weight">Legal Weight</label>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="row g-3 mb-3">
-                        <div class="col-md-4">
-                            <label class="form-label">Overall Length</label>
-                            <div class="dimension-group">
-                                {{ form.overall_length_ft }}<span>ft</span>
-                                {{ form.overall_length_in }}<span>in</span>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Overall Width</label>
-                            <div class="dimension-group">
-                                {{ form.overall_width_ft }}<span>ft</span>
-                                {{ form.overall_width_in }}<span>in</span>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Overall Height</label>
-                            <div class="dimension-group">
-                                {{ form.overall_height_ft }}<span>ft</span>
-                                {{ form.overall_height_in }}<span>in</span>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="row g-3 mb-3">
-                        <div class="col-md-4">
-                            <label class="form-label">Front Overhang</label>
-                            <div class="dimension-group">
-                                {{ form.front_overhang_ft }}<span>ft</span>
-                                {{ form.front_overhang_in }}<span>in</span>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Rear Overhang</label>
-                            <div class="dimension-group">
-                                {{ form.rear_overhang_ft }}<span>ft</span>
-                                {{ form.rear_overhang_in }}<span>in</span>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Gross Weight</label>
-                            <div class="dimension-group">
-                                {{ form.gross_weight }}<span>lbs</span>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label class="form-label">Left Overhang</label>
-                            <div class="dimension-group">
-                                {{ form.left_overhang_ft }}<span>ft</span>
-                                {{ form.left_overhang_in }}<span>in</span>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Right Overhang</label>
-                            <div class="dimension-group">
-                                {{ form.right_overhang_ft }}<span>ft</span>
-                                {{ form.right_overhang_in }}<span>in</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
             
             <!-- State Selection -->
             <div class="card mb-4 fade-in">
