@@ -27,30 +27,43 @@ class PermitRequestForm(forms.ModelForm):
     class Meta:
         model = PermitRequest
         fields = [
-            'load_description', 'load_make_model', 'load_serial',  # Added new fields here
-            'origin_address', 'destination_address',
-            'driver', 'truck', 'trailer', 'payment_method',
-            'overall_length_ft', 'overall_length_in',
-            'overall_width_ft', 'overall_width_in',
-            'overall_height_ft', 'overall_height_in',
-            'gross_weight', 'front_overhang_ft', 'front_overhang_in',
-            'rear_overhang_ft', 'rear_overhang_in',
-            'left_overhang_ft', 'left_overhang_in',
-            'right_overhang_ft', 'right_overhang_in',
-            'axle_configuration', 'num_axles', 'is_legal_weight',
-            'customer_comments',
-        ]
+        'load_description', 'load_make_model', 'load_serial',
+        'load_length', 'load_width', 'load_height', 'load_weight',
+        'load_detailed_description',
+        'origin_address', 'destination_address',
+        'driver', 'truck', 'trailer', 
+        'overall_length_ft', 'overall_length_in',
+        'overall_width_ft', 'overall_width_in',
+        'overall_height_ft', 'overall_height_in',
+        'gross_weight', 'front_overhang_ft', 'front_overhang_in',
+        'rear_overhang_ft', 'rear_overhang_in',
+        'left_overhang_ft', 'left_overhang_in',
+        'right_overhang_ft', 'right_overhang_in',
+        'num_axles', 'is_legal_weight',
+        'axle_weight_1', 'axle_weight_2', 'axle_weight_3',
+        'axle_weight_4', 'axle_weight_5', 'axle_weight_6',
+        'axle_weight_7', 'axle_weight_8', 'axle_weight_9',
+        'tires_per_axle_1', 'tires_per_axle_2', 'tires_per_axle_3',
+        'tires_per_axle_4', 'tires_per_axle_5', 'tires_per_axle_6',
+        'tires_per_axle_7', 'tires_per_axle_8', 'tires_per_axle_9',
+        'spacing_1_2', 'spacing_2_3', 'spacing_3_4', 'spacing_4_5',
+        'spacing_5_6', 'spacing_6_7', 'spacing_7_8', 'spacing_8_9',
+        'customer_comments',
+    ]
         widgets = {
             'load_description': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Object'}),
             'load_make_model': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Make/Model'}),
             'load_serial': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Serial#'}),
-            'load_description': forms.TextInput(attrs={'class': 'form-control'}),
+            'load_length': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Length', 'step': '0.1'}),
+            'load_width': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Width', 'step': '0.1'}),
+            'load_height': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Height', 'step': '0.1'}),
+            'load_weight': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Weight (lbs)'}),
+            'load_detailed_description': forms.Textarea(attrs={'class': 'form-control', 'rows': 4, 'placeholder': 'Detailed load description'}),
             'origin_address': forms.TextInput(attrs={'class': 'form-control'}),
             'destination_address': forms.TextInput(attrs={'class': 'form-control'}),
             'driver': forms.Select(attrs={'class': 'form-select'}),
             'truck': forms.Select(attrs={'class': 'form-select'}),
             'trailer': forms.Select(attrs={'class': 'form-select'}),
-            'payment_method': forms.Select(attrs={'class': 'form-select'}),
             'overall_length_ft': forms.NumberInput(attrs={'class': 'form-control dim-ft', 'placeholder': 'ft'}),
             'overall_length_in': forms.NumberInput(attrs={'class': 'form-control dim-in', 'placeholder': 'in'}),
             'overall_width_ft': forms.NumberInput(attrs={'class': 'form-control dim-ft', 'placeholder': 'ft'}),
@@ -66,9 +79,37 @@ class PermitRequestForm(forms.ModelForm):
             'left_overhang_in': forms.NumberInput(attrs={'class': 'form-control dim-in', 'placeholder': 'in'}),
             'right_overhang_ft': forms.NumberInput(attrs={'class': 'form-control dim-ft', 'placeholder': 'ft'}),
             'right_overhang_in': forms.NumberInput(attrs={'class': 'form-control dim-in', 'placeholder': 'in'}),
-            'axle_configuration': forms.Select(attrs={'class': 'form-select'}, choices=[(1, '1'), (2, '2'), (3, '3')]),
             'num_axles': forms.NumberInput(attrs={'class': 'form-control'}),
             'is_legal_weight': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'axle_weight_1': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'ax-1'}),
+            'axle_weight_2': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'ax-2'}),
+            'axle_weight_3': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'ax-3'}),
+            'axle_weight_4': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'ax-4'}),
+            'axle_weight_5': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'ax-5'}),
+            'axle_weight_6': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'ax-6'}),
+            'axle_weight_7': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'ax-7'}),
+            'axle_weight_8': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'ax-8'}),
+            'axle_weight_9': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'ax-9'}),
+            # Tires per axle
+            'tires_per_axle_1': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'ax-1'}),
+            'tires_per_axle_2': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'ax-2'}),
+            'tires_per_axle_3': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'ax-3'}),
+            'tires_per_axle_4': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'ax-4'}),
+            'tires_per_axle_5': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'ax-5'}),
+            'tires_per_axle_6': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'ax-6'}),
+            'tires_per_axle_7': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'ax-7'}),
+            'tires_per_axle_8': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'ax-8'}),
+            'tires_per_axle_9': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'ax-9'}),
+
+            # Spacings
+            'spacing_1_2': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '1-2', 'step': '0.1'}),
+            'spacing_2_3': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '2-3', 'step': '0.1'}),
+            'spacing_3_4': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '3-4', 'step': '0.1'}),
+            'spacing_4_5': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '4-5', 'step': '0.1'}),
+            'spacing_5_6': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '5-6', 'step': '0.1'}),
+            'spacing_6_7': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '6-7', 'step': '0.1'}),
+            'spacing_7_8': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '7-8', 'step': '0.1'}),
+            'spacing_8_9': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '8-9', 'step': '0.1'}),
             'customer_comments': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
         }
     
@@ -89,7 +130,7 @@ class PermitRequestForm(forms.ModelForm):
                 vehicle_type=Vehicle.VehicleType.TRAILER,
                 is_active=True
             )
-            self.fields['payment_method'].queryset = company.payment_methods.all()
+            #self.fields['payment_method'].queryset = company.payment_methods.all()
 
 
 class PermitStateForm(forms.ModelForm):

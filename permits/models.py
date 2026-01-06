@@ -40,10 +40,18 @@ class PermitRequest(models.Model):
         related_name='assigned_permits'
     )
     
+    
     # Load info
-    load_description = models.CharField(max_length=200, verbose_name="Object/Load Description")
+    load_description = models.CharField(max_length=200, verbose_name="Cargo/Load Description")
     load_make_model = models.CharField(max_length=200, blank=True, verbose_name="Make/Model")
     load_serial = models.CharField(max_length=200, blank=True, verbose_name="Serial#")
+    load_length = models.DecimalField(max_digits=5, decimal_places=1, default=0, blank=True, verbose_name="Length")
+    load_width = models.DecimalField(max_digits=5, decimal_places=1, default=0, blank=True, verbose_name="Width")
+    load_height = models.DecimalField(max_digits=5, decimal_places=1, default=0, blank=True, verbose_name="Height")
+    load_weight = models.PositiveIntegerField(default=0, blank=True, verbose_name="Weight")
+    load_detailed_description = models.TextField(blank=True, verbose_name="Detailed Load Description")
+    origin_address = models.CharField(max_length=300)
+    destination_address = models.CharField(max_length=300)
     origin_address = models.CharField(max_length=300)
     destination_address = models.CharField(max_length=300)
     
@@ -92,6 +100,38 @@ class PermitRequest(models.Model):
     axle_configuration = models.PositiveIntegerField(default=1)  # Which config to use
     num_axles = models.PositiveIntegerField(default=0)
     is_legal_weight = models.BooleanField(default=False)
+    
+    # Axle weights (ax-1 through ax-9)
+    axle_weight_1 = models.PositiveIntegerField(default=0, blank=True, verbose_name="Ax-1 Weight")
+    axle_weight_2 = models.PositiveIntegerField(default=0, blank=True, verbose_name="Ax-2 Weight")
+    axle_weight_3 = models.PositiveIntegerField(default=0, blank=True, verbose_name="Ax-3 Weight")
+    axle_weight_4 = models.PositiveIntegerField(default=0, blank=True, verbose_name="Ax-4 Weight")
+    axle_weight_5 = models.PositiveIntegerField(default=0, blank=True, verbose_name="Ax-5 Weight")
+    axle_weight_6 = models.PositiveIntegerField(default=0, blank=True, verbose_name="Ax-6 Weight")
+    axle_weight_7 = models.PositiveIntegerField(default=0, blank=True, verbose_name="Ax-7 Weight")
+    axle_weight_8 = models.PositiveIntegerField(default=0, blank=True, verbose_name="Ax-8 Weight")
+    axle_weight_9 = models.PositiveIntegerField(default=0, blank=True, verbose_name="Ax-9 Weight")
+
+    # Tires per axle (9 fields)
+    tires_per_axle_1 = models.PositiveIntegerField(default=0, blank=True, verbose_name="Tires Ax-1")
+    tires_per_axle_2 = models.PositiveIntegerField(default=0, blank=True, verbose_name="Tires Ax-2")
+    tires_per_axle_3 = models.PositiveIntegerField(default=0, blank=True, verbose_name="Tires Ax-3")
+    tires_per_axle_4 = models.PositiveIntegerField(default=0, blank=True, verbose_name="Tires Ax-4")
+    tires_per_axle_5 = models.PositiveIntegerField(default=0, blank=True, verbose_name="Tires Ax-5")
+    tires_per_axle_6 = models.PositiveIntegerField(default=0, blank=True, verbose_name="Tires Ax-6")
+    tires_per_axle_7 = models.PositiveIntegerField(default=0, blank=True, verbose_name="Tires Ax-7")
+    tires_per_axle_8 = models.PositiveIntegerField(default=0, blank=True, verbose_name="Tires Ax-8")
+    tires_per_axle_9 = models.PositiveIntegerField(default=0, blank=True, verbose_name="Tires Ax-9")
+
+    # Spacings between axles (8 fields: 1-2, 2-3, ..., 8-9)
+    spacing_1_2 = models.DecimalField(max_digits=5, decimal_places=1, default=0, blank=True, verbose_name="Spacing 1-2")
+    spacing_2_3 = models.DecimalField(max_digits=5, decimal_places=1, default=0, blank=True, verbose_name="Spacing 2-3")
+    spacing_3_4 = models.DecimalField(max_digits=5, decimal_places=1, default=0, blank=True, verbose_name="Spacing 3-4")
+    spacing_4_5 = models.DecimalField(max_digits=5, decimal_places=1, default=0, blank=True, verbose_name="Spacing 4-5")
+    spacing_5_6 = models.DecimalField(max_digits=5, decimal_places=1, default=0, blank=True, verbose_name="Spacing 5-6")
+    spacing_6_7 = models.DecimalField(max_digits=5, decimal_places=1, default=0, blank=True, verbose_name="Spacing 6-7")
+    spacing_7_8 = models.DecimalField(max_digits=5, decimal_places=1, default=0, blank=True, verbose_name="Spacing 7-8")
+    spacing_8_9 = models.DecimalField(max_digits=5, decimal_places=1, default=0, blank=True, verbose_name="Spacing 8-9")
     
     # Payment
     payment_method = models.ForeignKey(
