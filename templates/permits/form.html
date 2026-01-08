@@ -65,7 +65,42 @@ input[type=number] {
     -moz-appearance: textfield;
     appearance: textfield;
 }
+
+
+    #us-map-svg {
+        width: 100%;
+        max-width: 800px;
+        margin: 0 auto;
+        display: block;
+    }
+    #us-map-svg path {
+        fill: #e9ecef;
+        stroke: #fff;
+        stroke-width: 1.5;
+        cursor: pointer;
+        transition: fill 0.2s;
+    }
+    #us-map-svg path:hover {
+        fill: #007bff;
+        opacity: 0.8;
+    }
+    #us-map-svg path.selected {
+        fill: #28a745;
+    }
+    .map-tooltip {
+        position: absolute;
+        background: #333;
+        color: #fff;
+        padding: 8px 12px;
+        border-radius: 4px;
+        font-size: 12px;
+        pointer-events: none;
+        z-index: 1000;
+        display: none;
+    }
 </style>
+
+
 {% endblock %}
 
 {% block content %}
@@ -387,6 +422,32 @@ input[type=number] {
                 </div>
             </div>
 
+            <!-- Interactive Map -->
+            <div class="card mb-4 fade-in">
+                <div class="card-header">
+                    <i class="bi bi-map me-2"></i>Interactive Route Map
+                </div>
+                <div class="card-body">
+                    <p class="text-muted mb-3">
+                        <strong>Click states</strong> to add them in travel order. 
+                        <strong>Click again</strong> to remove. 
+                        <strong>Hover</strong> for permit requirements.
+                    </p>
+                    
+                    <div id="mapContainer" style="position: relative;">
+                        <div id="us-map"></div>
+                        <div class="map-tooltip" id="mapTooltip"></div>
+                    </div>
+                    
+                    <div class="mt-3 d-flex justify-content-between align-items-center">
+                        <button type="button" class="btn btn-sm btn-outline-danger" id="clearMapBtn">
+                            <i class="bi bi-x-circle me-1"></i>Clear Route
+                        </button>
+                        <span class="text-muted">Route: <strong id="routeDisplay">No states selected</strong></span>
+                    </div>
+                </div>
+            </div>
+
             <!-- State Selection -->
             <div class="card mb-4 fade-in">
                 <div class="card-header">
@@ -410,6 +471,8 @@ input[type=number] {
                     </button>
                 </div>
             </div>
+
+        
 
             <!-- Comments -->
             <div class="card mb-4 fade-in">
@@ -450,7 +513,97 @@ input[type=number] {
 {% endblock %}
 
 {% block extra_js %}
+
+<!-- D3.js for map rendering -->
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="https://d3js.org/topojson.v3.min.js"></script>
+
 <script>
+// State data with names and abbreviations
+const stateData = {
+    "01": "AL", "02": "AK", "04": "AZ", "05": "AR", "06": "CA",
+    "08": "CO", "09": "CT", "10": "DE", "11": "DC", "12": "FL",
+    "13": "GA", "15": "HI", "16": "ID", "17": "IL", "18": "IN",
+    "19": "IA", "20": "KS", "21": "KY", "22": "LA", "23": "ME",
+    "24": "MD", "25": "MA", "26": "MI", "27": "MN", "28": "MS",
+    "29": "MO", "30": "MT", "31": "NE", "32": "NV", "33": "NH",
+    "34": "NJ", "35": "NM", "36": "NY", "37": "NC", "38": "ND",
+    "39": "OH", "40": "OK", "41": "OR", "42": "PA", "44": "RI",
+    "45": "SC", "46": "SD", "47": "TN", "48": "TX", "49": "UT",
+    "50": "VT", "51": "VA", "53": "WA", "54": "WV", "55": "WI", "56": "WY"
+};
+
+const stateNames = {
+    "AL": "Alabama", "AK": "Alaska", "AZ": "Arizona", "AR": "Arkansas",
+    "CA": "California", "CO": "Colorado", "CT": "Connecticut", "DE": "Delaware",
+    "FL": "Florida", "GA": "Georgia", "HI": "Hawaii", "ID": "Idaho",
+    "IL": "Illinois", "IN": "Indiana", "IA": "Iowa", "KS": "Kansas",
+    "KY": "Kentucky", "LA": "Louisiana", "ME": "Maine", "MD": "Maryland",
+    "MA": "Massachusetts", "MI": "Michigan", "MN": "Minnesota", "MS": "Mississippi",
+    "MO": "Missouri", "MT": "Montana", "NE": "Nebraska", "NV": "Nevada",
+    "NH": "New Hampshire", "NJ": "New Jersey", "NM": "New Mexico", "NY": "New York",
+    "NC": "North Carolina", "ND": "North Dakota", "OH": "Ohio", "OK": "Oklahoma",
+    "OR": "Oregon", "PA": "Pennsylvania", "RI": "Rhode Island", "SC": "South Carolina",
+    "SD": "South Dakota", "TN": "Tennessee", "TX": "Texas", "UT": "Utah",
+    "VT": "Vermont", "VA": "Virginia", "WA": "Washington", "WV": "West Virginia",
+    "WI": "Wisconsin", "WY": "Wyoming"
+};
+
+// State permit requirements
+const stateRequirements = {
+    "AL": "Alabama: Requirements to be added",
+    "AK": "Alaska: Requirements to be added",
+    "AZ": "Arizona: Requirements to be added",
+    "AR": "Arkansas: Requirements to be added",
+    "CA": "California: Requirements to be added",
+    "CO": "Colorado: Requirements to be added",
+    "CT": "Connecticut: Requirements to be added",
+    "DE": "Delaware: Requirements to be added",
+    "FL": "Florida: Requirements to be added",
+    "GA": "Georgia: Requirements to be added",
+    "HI": "Hawaii: Requirements to be added",
+    "ID": "Idaho: Requirements to be added",
+    "IL": "Illinois: Requirements to be added",
+    "IN": "Indiana: Requirements to be added",
+    "IA": "Iowa: Requirements to be added",
+    "KS": "Kansas: Requirements to be added",
+    "KY": "Kentucky: Requirements to be added",
+    "LA": "Louisiana: Requirements to be added",
+    "ME": "Maine: Requirements to be added",
+    "MD": "Maryland: Requirements to be added",
+    "MA": "Massachusetts: Requirements to be added",
+    "MI": "Michigan: Requirements to be added",
+    "MN": "Minnesota: Requirements to be added",
+    "MS": "Mississippi: Requirements to be added",
+    "MO": "Missouri: Requirements to be added",
+    "MT": "Montana: Requirements to be added",
+    "NE": "Nebraska: Requirements to be added",
+    "NV": "Nevada: Requirements to be added",
+    "NH": "New Hampshire: Requirements to be added",
+    "NJ": "New Jersey: Requirements to be added",
+    "NM": "New Mexico: Requirements to be added",
+    "NY": "New York: Requirements to be added",
+    "NC": "North Carolina: Requirements to be added",
+    "ND": "North Dakota: Requirements to be added",
+    "OH": "Ohio: Requirements to be added",
+    "OK": "Oklahoma: Requirements to be added",
+    "OR": "Oregon: Requirements to be added",
+    "PA": "Pennsylvania: Requirements to be added",
+    "RI": "Rhode Island: Requirements to be added",
+    "SC": "South Carolina: Requirements to be added",
+    "SD": "South Dakota: Requirements to be added",
+    "TN": "Tennessee: Requirements to be added",
+    "TX": "Texas: Requirements to be added",
+    "UT": "Utah: Requirements to be added",
+    "VT": "Vermont: Requirements to be added",
+    "VA": "Virginia: Requirements to be added",
+    "WA": "Washington: Requirements to be added",
+    "WV": "West Virginia: Requirements to be added",
+    "WI": "Wisconsin: Requirements to be added",
+    "WY": "Wyoming: Requirements to be added"
+};
+
+// State choices array
 const stateChoices = [
     ['AL', 'Alabama'], ['AK', 'Alaska'], ['AZ', 'Arizona'], ['AR', 'Arkansas'],
     ['CA', 'California'], ['CO', 'Colorado'], ['CT', 'Connecticut'], ['DE', 'Delaware'],
@@ -467,36 +620,134 @@ const stateChoices = [
     ['WI', 'Wisconsin'], ['WY', 'Wyoming']
 ];
 
+// ============================================
+// UNIFIED STATE MANAGEMENT
+// ============================================
+let mapSelectedStates = [];  // Ordered array for route
+let selectedStates = new Set();  // Set for quick lookups
 const selectedStatesContainer = document.getElementById('selectedStates');
-let selectedStates = new Set();
 
-// Load existing states if editing
-{% if existing_states %}
-const existingStates = {{ existing_states|safe }};
-existingStates.forEach(s => {
-    addStateRow(s.state, s.travel_date, s.route, s.comments);
-});
-{% endif %}
+// Toggle state selection (used by both map clicks and button clicks)
+function toggleStateSelection(stateCode) {
+    const index = mapSelectedStates.indexOf(stateCode);
+    
+    if (index > -1) {
+        // DESELECT: Remove state
+        mapSelectedStates.splice(index, 1);
+        selectedStates.delete(stateCode);
+        
+        // Remove the row from form
+        removeStateRow(stateCode);
+        
+        // Update map appearance
+        d3.select(`.state-path[data-state="${stateCode}"]`).attr("fill", "#e9ecef");
+    } else {
+        // SELECT: Add state
+        mapSelectedStates.push(stateCode);
+        selectedStates.add(stateCode);
+        
+        // Add row to form
+        addStateRow(stateCode);
+        
+        // Update map appearance
+        d3.select(`.state-path[data-state="${stateCode}"]`).attr("fill", "#28a745");
+    }
+    
+    updateMapRouteDisplay();
+    updateStateNumbers();
+    syncStateButtons();
+}
 
-// State button click handler
-document.querySelectorAll('.state-btn').forEach(btn => {
-    btn.addEventListener('click', function() {
-        const state = this.dataset.state;
-        if (!selectedStates.has(state)) {
-            addStateRow(state);
-            this.classList.add('selected');
+// Remove state row by state code
+function removeStateRow(stateCode) {
+    const rows = document.querySelectorAll('#selectedStates .state-row');
+    rows.forEach(row => {
+        const select = row.querySelector('select');
+        if (select && select.value === stateCode) {
+            row.remove();
         }
     });
-});
+}
 
-// Add state button
-document.getElementById('addStateBtn').addEventListener('click', () => {
-    addStateRow('');
-});
+// Update numbers displayed on the map
+function updateStateNumbers() {
+    if (!window.mapLabelsGroup || !window.mapPath || !window.mapUs) return;
+    
+    // Clear existing labels
+    window.mapLabelsGroup.selectAll("*").remove();
+    
+    // Add number labels for each selected state
+    const features = topojson.feature(window.mapUs, window.mapUs.objects.states).features;
+    
+    mapSelectedStates.forEach((stateCode, index) => {
+        // Find the feature for this state
+        const stateId = Object.keys(stateData).find(id => stateData[id] === stateCode);
+        const feature = features.find(f => f.id === stateId);
+        
+        if (feature) {
+            const centroid = window.mapPath.centroid(feature);
+            
+            // Add a white circle background
+            window.mapLabelsGroup.append("circle")
+                .attr("cx", centroid[0])
+                .attr("cy", centroid[1])
+                .attr("r", 14)
+                .attr("fill", "white")
+                .attr("stroke", "#28a745")
+                .attr("stroke-width", 2)
+                .style("pointer-events", "none");
+            
+            // Add the number text
+            window.mapLabelsGroup.append("text")
+                .attr("x", centroid[0])
+                .attr("y", centroid[1])
+                .attr("text-anchor", "middle")
+                .attr("dominant-baseline", "central")
+                .attr("font-size", "12px")
+                .attr("font-weight", "bold")
+                .attr("fill", "#28a745")
+                .style("pointer-events", "none")
+                .text(index + 1);
+        }
+    });
+}
 
+// Update route display
+function updateMapRouteDisplay() {
+    const routeText = mapSelectedStates.length > 0 
+        ? mapSelectedStates.map((s, i) => `${i + 1}. ${s}`).join(' → ')
+        : 'No states selected';
+    document.getElementById('routeDisplay').textContent = routeText;
+}
+
+// Sync state buttons with current selection
+function syncStateButtons() {
+    document.querySelectorAll('.state-btn').forEach(btn => {
+        const state = btn.dataset.state;
+        if (mapSelectedStates.includes(state)) {
+            btn.classList.add('selected');
+        } else {
+            btn.classList.remove('selected');
+        }
+    });
+}
+
+// Add state row to form
 function addStateRow(stateCode = '', date = '', route = '', comments = '') {
+    // Don't add duplicate rows
+    if (stateCode) {
+        const existingRows = document.querySelectorAll('#selectedStates .state-row select');
+        for (let select of existingRows) {
+            if (select.value === stateCode) {
+                return; // Row already exists
+            }
+        }
+    }
+    
     const row = document.createElement('div');
     row.className = 'state-row d-flex gap-2 align-items-center';
+    row.dataset.stateCode = stateCode;
+    
     row.innerHTML = `
         <select name="selected_states[]" class="form-select form-select-sm" style="width: 80px;" required>
             <option value="">--</option>
@@ -510,21 +761,63 @@ function addStateRow(stateCode = '', date = '', route = '', comments = '') {
         <button type="button" class="btn btn-sm btn-outline-danger remove-state"><i class="bi bi-x"></i></button>
     `;
 
+    // Remove button handler - syncs with map
     row.querySelector('.remove-state').addEventListener('click', () => {
         const select = row.querySelector('select');
-        if (select.value) {
-            document.querySelector(`.state-btn[data-state="${select.value}"]`)?.classList.remove('selected');
-            selectedStates.delete(select.value);
+        const stateToRemove = select.value;
+        
+        if (stateToRemove) {
+            // Remove from tracking arrays
+            const mapIndex = mapSelectedStates.indexOf(stateToRemove);
+            if (mapIndex > -1) {
+                mapSelectedStates.splice(mapIndex, 1);
+            }
+            selectedStates.delete(stateToRemove);
+            
+            // Update map appearance
+            d3.select(`.state-path[data-state="${stateToRemove}"]`).attr("fill", "#e9ecef");
+            
+            // Update button
+            document.querySelector(`.state-btn[data-state="${stateToRemove}"]`)?.classList.remove('selected');
         }
+        
         row.remove();
+        updateMapRouteDisplay();
+        updateStateNumbers();
     });
 
+    // Dropdown change handler - syncs with map
     row.querySelector('select').addEventListener('change', function() {
-        // Update name attributes with new state code
+        const oldState = row.dataset.stateCode;
         const newState = this.value;
+        
+        // Remove old state from tracking
+        if (oldState) {
+            const oldIndex = mapSelectedStates.indexOf(oldState);
+            if (oldIndex > -1) {
+                mapSelectedStates.splice(oldIndex, 1);
+            }
+            selectedStates.delete(oldState);
+            d3.select(`.state-path[data-state="${oldState}"]`).attr("fill", "#e9ecef");
+            document.querySelector(`.state-btn[data-state="${oldState}"]`)?.classList.remove('selected');
+        }
+        
+        // Add new state to tracking
+        if (newState && !mapSelectedStates.includes(newState)) {
+            mapSelectedStates.push(newState);
+            selectedStates.add(newState);
+            d3.select(`.state-path[data-state="${newState}"]`).attr("fill", "#28a745");
+            document.querySelector(`.state-btn[data-state="${newState}"]`)?.classList.add('selected');
+        }
+        
+        // Update row data attribute and input names
+        row.dataset.stateCode = newState;
         row.querySelector('input[type="date"]').name = `state_date_${newState}`;
         row.querySelectorAll('input[type="text"]')[0].name = `state_route_${newState}`;
         row.querySelectorAll('input[type="text"]')[1].name = `state_comments_${newState}`;
+        
+        updateMapRouteDisplay();
+        updateStateNumbers();
     });
 
     selectedStatesContainer.appendChild(row);
@@ -535,12 +828,125 @@ function addStateRow(stateCode = '', date = '', route = '', comments = '') {
     }
 }
 
+// ============================================
+// MAP INITIALIZATION
+// ============================================
+d3.json("https://cdn.jsdelivr.net/npm/us-atlas@3/states-albers-10m.json").then(function(us) {
+    console.log("Map data loaded:", us);
+    const width = 975;
+    const height = 610;
+
+    const svg = d3.select("#us-map")
+        .append("svg")
+        .attr("viewBox", [0, 0, width, height])
+        .attr("width", "100%")
+        .attr("height", "100%")
+        .style("max-width", "900px")
+        .style("display", "block")
+        .style("margin", "0 auto")
+        .style("background", "#f8f9fa");
+
+    const path = d3.geoPath();
+    const tooltip = d3.select("#mapTooltip");
+    
+    // Create a group for states
+    const statesGroup = svg.append("g").attr("class", "states-group");
+    
+    // Create a group for labels (numbers) - renders on top of states
+    const labelsGroup = svg.append("g").attr("class", "labels-group");
+    
+    statesGroup.selectAll("path")
+        .data(topojson.feature(us, us.objects.states).features)
+        .enter()
+        .append("path")
+        .attr("d", path)
+        .attr("fill", "#e9ecef")
+        .attr("stroke", "#fff")
+        .attr("stroke-width", 1.5)
+        .attr("data-state", d => stateData[d.id] || "")
+        .attr("data-id", d => d.id)
+        .attr("class", "state-path")
+        .style("cursor", "pointer")
+        .on("mouseover", function(event, d) {
+            const stateCode = stateData[d.id];
+            if (stateCode) {
+                d3.select(this).attr("fill", mapSelectedStates.includes(stateCode) ? "#1e7e34" : "#007bff");
+                const requirement = stateRequirements[stateCode] || "Requirements to be added";
+                tooltip.style("display", "block")
+                    .html(`<strong>${stateNames[stateCode]}</strong><br>${requirement}`)
+                    .style("left", (event.pageX + 10) + "px")
+                    .style("top", (event.pageY - 10) + "px");
+            }
+        })
+        .on("mouseout", function(event, d) {
+            const stateCode = stateData[d.id];
+            if (stateCode) {
+                d3.select(this).attr("fill", mapSelectedStates.includes(stateCode) ? "#28a745" : "#e9ecef");
+                tooltip.style("display", "none");
+            }
+        })
+        .on("click", function(event, d) {
+            const stateCode = stateData[d.id];
+            if (stateCode) {
+                toggleStateSelection(stateCode);
+            }
+        });
+    
+    // Add state borders
+    svg.append("path")
+        .datum(topojson.mesh(us, us.objects.states, (a, b) => a !== b))
+        .attr("fill", "none")
+        .attr("stroke", "#fff")
+        .attr("stroke-linejoin", "round")
+        .attr("d", path);
+        
+    // Store references globally for updating labels
+    window.mapLabelsGroup = labelsGroup;
+    window.mapPath = path;
+    window.mapUs = us;
+        
+}).catch(function(error) {
+    console.error("Error loading map:", error);
+    document.getElementById("us-map").innerHTML = '<p class="text-muted text-center">Map could not be loaded. Please use the state buttons below.</p>';
+});
+
+// ============================================
+// EVENT HANDLERS
+// ============================================
+
+// State button click handler
+document.querySelectorAll('.state-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const state = this.dataset.state;
+        toggleStateSelection(state);
+    });
+});
+
+// Add State Row button (manual add)
+document.getElementById('addStateBtn').addEventListener('click', () => {
+    addStateRow('');
+});
+
+// Clear Route button
+document.getElementById('clearMapBtn')?.addEventListener('click', function() {
+    mapSelectedStates = [];
+    selectedStates.clear();
+    d3.selectAll('.state-path').attr('fill', '#e9ecef');
+    updateMapRouteDisplay();
+    updateStateNumbers();
+    syncStateButtons();
+    document.getElementById('selectedStates').innerHTML = '';
+});
+
 // Update driver email when driver changes
 document.getElementById('id_driver')?.addEventListener('change', function() {
     const option = this.options[this.selectedIndex];
     document.getElementById('driverEmail').value = option.text.includes('@') ? option.text : '-';
 });
-// Auto-calculate gross weight from axle weights
+
+// ============================================
+// GROSS WEIGHT CALCULATION
+// ============================================
 function calculateGrossWeight() {
     let total = 0;
     for (let i = 1; i <= 9; i++) {
@@ -561,22 +967,21 @@ for (let i = 1; i <= 9; i++) {
     }
 }
 
-// Equipment combination auto-fill
+// ============================================
+// EQUIPMENT COMBINATION SELECTOR
+// ============================================
 const combinationSelector = document.getElementById('combinationSelector');
 if (combinationSelector) {
     combinationSelector.addEventListener('change', function() {
         const selectedOption = this.options[this.selectedIndex];
         
         if (this.value) {
-            // Get data from selected option
             const driverId = selectedOption.dataset.driver;
             const truckId = selectedOption.dataset.truck;
             const trailerId = selectedOption.dataset.trailer;
             
-            // Auto-fill the form fields
             if (driverId) {
                 document.getElementById('id_driver').value = driverId;
-                // Trigger change event to update driver email
                 document.getElementById('id_driver').dispatchEvent(new Event('change'));
             }
             if (truckId) {
@@ -586,7 +991,6 @@ if (combinationSelector) {
                 document.getElementById('id_trailer').value = trailerId;
             }
         } else {
-            // Clear selections if "Select manually" is chosen
             document.getElementById('id_driver').value = '';
             document.getElementById('id_truck').value = '';
             document.getElementById('id_trailer').value = '';
