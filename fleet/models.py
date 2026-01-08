@@ -139,3 +139,51 @@ class AxleWeight(models.Model):
     class Meta:
         ordering = ['axle_number']
 
+class EquipmentCombination(models.Model):
+    """Saved combination of driver, truck, and trailer for quick selection."""
+    
+    company = models.ForeignKey(
+        Company,
+        on_delete=models.CASCADE,
+        related_name='equipment_combinations'
+    )
+    driver = models.ForeignKey(
+        Driver,
+        on_delete=models.CASCADE,
+    )
+    truck = models.ForeignKey(
+        Vehicle,
+        on_delete=models.CASCADE,
+        related_name='truck_combinations',
+        null=True,
+        blank=True,
+        limit_choices_to={'vehicle_type': Vehicle.VehicleType.TRUCK}
+    )
+    trailer = models.ForeignKey(
+        Vehicle,
+        on_delete=models.CASCADE,
+        related_name='trailer_combinations',
+        null=True,
+        blank=True,
+        limit_choices_to={'vehicle_type': Vehicle.VehicleType.TRAILER}
+    )
+    is_default = models.BooleanField(default=False, help_text="Use this as default for new permits")
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['-is_default', 'driver__last_name']
+        unique_together = ['company', 'driver', 'truck', 'trailer']  # Changed from name
+    
+    def __str__(self):
+        return f"{self.driver.full_name} - {self.truck.unit_number if self.truck else 'No Truck'} / {self.trailer.unit_number if self.trailer else 'No Trailer'}"
+    
+    def save(self, *args, **kwargs):
+        # If this is set as default, unset other defaults for this company
+        if self.is_default:
+            EquipmentCombination.objects.filter(
+                company=self.company,
+                is_default=True
+            ).exclude(pk=self.pk).update(is_default=False)
+        super().save(*args, **kwargs)

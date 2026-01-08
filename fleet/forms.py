@@ -1,5 +1,5 @@
 from django import forms
-from .models import Vehicle, Driver, AxleConfiguration
+from .models import Vehicle, Driver, AxleConfiguration, EquipmentCombination
 
 
 class VehicleForm(forms.ModelForm):
@@ -82,3 +82,33 @@ class DriverForm(forms.ModelForm):
             'license_state': forms.TextInput(attrs={'class': 'form-control', 'maxlength': '2'}),
             'is_active': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
+
+class EquipmentCombinationForm(forms.ModelForm):
+    """Form for creating/editing equipment combinations."""
+    
+    class Meta:
+        model = EquipmentCombination
+        fields = ['driver', 'truck', 'trailer', 'is_default']
+        widgets = {
+            'driver': forms.Select(attrs={'class': 'form-select'}),
+            'truck': forms.Select(attrs={'class': 'form-select'}),
+            'trailer': forms.Select(attrs={'class': 'form-select'}),
+            'is_default': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+        }
+    
+    def __init__(self, *args, company=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        
+        if company:
+            # Filter queryset to company's resources
+            self.fields['driver'].queryset = Driver.objects.filter(company=company, is_active=True)
+            self.fields['truck'].queryset = Vehicle.objects.filter(
+                company=company,
+                vehicle_type=Vehicle.VehicleType.TRUCK,
+                is_active=True
+            )
+            self.fields['trailer'].queryset = Vehicle.objects.filter(
+                company=company,
+                vehicle_type=Vehicle.VehicleType.TRAILER,
+                is_active=True
+            )

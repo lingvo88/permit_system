@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }} - PermitPro{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>{{ title }}</h1>
+    <p class="subtitle">Save a combination of driver, truck, and trailer for quick selection</p>
+</div>
+
+<a href="{% url 'fleet:combination_list' %}" class="btn btn-secondary mb-4">
+    <i class="bi bi-arrow-left me-2"></i>Back to Combinations
+</a>
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card fade-in">
+            <div class="card-body p-4">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Driver *</label>
+                        {{ form.driver }}
+                        {% if form.driver.errors %}
+                            <div class="invalid-feedback d-block">{{ form.driver.errors }}</div>
+                        {% endif %}
+                        <small class="text-muted">Select the driver for this combination</small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Truck</label>
+                        {{ form.truck }}
+                        {% if form.truck.errors %}
+                            <div class="invalid-feedback d-block">{{ form.truck.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Trailer</label>
+                        {{ form.trailer }}
+                        {% if form.trailer.errors %}
+                            <div class="invalid-feedback d-block">{{ form.trailer.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-4">
+                        <div class="form-check">
+                            {{ form.is_default }}
+                            <label class="form-check-label" for="{{ form.is_default.id_for_label }}">
+                                Set as default combination
+                            </label>
+                        </div>
+                        <small class="text-muted">Default combination will be automatically selected when creating new permits</small>
+                    </div>
+                    
+                    <hr>
+                    
+                    <div class="d-flex justify-content-between">
+                        <button type="submit" class="btn btn-success">
+                            <i class="bi bi-check-circle me-2"></i>Save Combination
+                        </button>
+                        <a href="{% url 'fleet:combination_list' %}" class="btn btn-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -89,7 +89,27 @@ input[type=number] {
             </div>
         </div>
 
+        {% if combinations %}
         <div class="row mt-3 pt-3 border-top border-light">
+            <div class="col-12 mb-3">
+                <label class="form-label text-white-50">Quick Select Equipment Combination</label>
+                <select id="combinationSelector" class="form-select">
+                    <option value="">-- Select a saved combination or choose manually below --</option>
+                    {% for combo in combinations %}
+                    <option value="{{ combo.id }}" 
+                            data-driver="{{ combo.driver.id }}"
+                            data-truck="{{ combo.truck.id|default:'' }}"
+                            data-trailer="{{ combo.trailer.id|default:'' }}"
+                            {% if combo.is_default %}selected{% endif %}>
+                        {{ combo.driver.full_name }} - {{ combo.truck.unit_number|default:"No Truck" }} / {{ combo.trailer.unit_number|default:"No Trailer" }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="row mt-3 {% if not combinations %}pt-3 border-top border-light{% endif %}">
             <div class="col-md-6">
                 <label class="form-label text-white-50">Driver</label>
                 {{ form.driver }}
@@ -99,8 +119,8 @@ input[type=number] {
                 <input type="text" class="form-control" id="driverEmail" readonly value="-">
             </div>
         </div>
-    </div>
-</div>
+            </div>
+        </div>
 
 <form method="post" id="permitForm">
     {% csrf_token %}
@@ -539,6 +559,40 @@ for (let i = 1; i <= 9; i++) {
     if (input) {
         input.addEventListener('input', calculateGrossWeight);
     }
+}
+
+// Equipment combination auto-fill
+const combinationSelector = document.getElementById('combinationSelector');
+if (combinationSelector) {
+    combinationSelector.addEventListener('change', function() {
+        const selectedOption = this.options[this.selectedIndex];
+        
+        if (this.value) {
+            // Get data from selected option
+            const driverId = selectedOption.dataset.driver;
+            const truckId = selectedOption.dataset.truck;
+            const trailerId = selectedOption.dataset.trailer;
+            
+            // Auto-fill the form fields
+            if (driverId) {
+                document.getElementById('id_driver').value = driverId;
+                // Trigger change event to update driver email
+                document.getElementById('id_driver').dispatchEvent(new Event('change'));
+            }
+            if (truckId) {
+                document.getElementById('id_truck').value = truckId;
+            }
+            if (trailerId) {
+                document.getElementById('id_trailer').value = trailerId;
+            }
+        } else {
+            // Clear selections if "Select manually" is chosen
+            document.getElementById('id_driver').value = '';
+            document.getElementById('id_truck').value = '';
+            document.getElementById('id_trailer').value = '';
+            document.getElementById('driverEmail').value = '-';
+        }
+    });
 }
 </script>
 {% endblock %}

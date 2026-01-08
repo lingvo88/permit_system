@@ -6,7 +6,8 @@ from django.db.models import Q
 
 from .models import Vehicle, Driver, AxleConfiguration
 from .forms import VehicleForm, DriverForm
-
+from .models import Vehicle, Driver, EquipmentCombination
+from .forms import VehicleForm, DriverForm, EquipmentCombinationForm
 
 @login_required
 def fleet_list(request):
@@ -310,3 +311,102 @@ def api_drivers(request):
     
     return JsonResponse({'drivers': data})
 
+@login_required
+def combination_list(request):
+    """List all equipment combinations for the company."""
+    
+    if not request.user.is_customer or not request.user.company:
+        messages.error(request, 'Access denied.')
+        return redirect('dashboard:index')
+    
+    combinations = EquipmentCombination.objects.filter(company=request.user.company)
+    
+    return render(request, 'fleet/combination_list.html', {
+        'combinations': combinations,
+    })
+
+
+@login_required
+def combination_create(request):
+    """Create a new equipment combination."""
+    
+    if not request.user.is_customer or not request.user.company:
+        messages.error(request, 'Access denied.')
+        return redirect('dashboard:index')
+    
+    if request.method == 'POST':
+        form = EquipmentCombinationForm(request.POST, company=request.user.company)
+        if form.is_valid():
+            combination = form.save(commit=False)
+            combination.company = request.user.company
+            combination.save()
+            messages.success(request, 'Equipment combination created successfully.')
+            return redirect('fleet:combination_list')
+    else:
+        form = EquipmentCombinationForm(company=request.user.company)
+    
+    return render(request, 'fleet/combination_form.html', {
+        'form': form,
+        'title': 'Create Equipment Combination',
+    })
+
+
+@login_required
+def combination_edit(request, combination_id):
+    """Edit an equipment combination."""
+    
+    if not request.user.is_customer or not request.user.company:
+        messages.error(request, 'Access denied.')
+        return redirect('dashboard:index')
+    
+    combination = get_object_or_404(
+        EquipmentCombination,
+        pk=combination_id,
+        company=request.user.company
+    )
+    
+    if request.method == 'POST':
+        form = EquipmentCombinationForm(
+            request.POST,
+            instance=combination,
+            company=request.user.company
+        )
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Equipment combination updated successfully.')
+            return redirect('fleet:combination_list')
+    else:
+        form = EquipmentCombinationForm(
+            instance=combination,
+            company=request.user.company
+        )
+    
+    return render(request, 'fleet/combination_form.html', {
+        'form': form,
+        'combination': combination,
+        'title': 'Edit Equipment Combination',
+    })
+
+
+@login_required
+def combination_delete(request, combination_id):
+    """Delete an equipment combination."""
+    
+    if not request.user.is_customer or not request.user.company:
+        messages.error(request, 'Access denied.')
+        return redirect('dashboard:index')
+    
+    combination = get_object_or_404(
+        EquipmentCombination,
+        pk=combination_id,
+        company=request.user.company
+    )
+    
+    if request.method == 'POST':
+        combination.delete()
+        messages.success(request, 'Equipment combination deleted successfully.')
+        return redirect('fleet:combination_list')
+    
+    return render(request, 'fleet/combination_confirm_delete.html', {
+        'combination': combination,
+    })

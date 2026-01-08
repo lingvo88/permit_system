@@ -20,5 +20,12 @@ urlpatterns = [
     # API
     path('api/vehicles/', views.api_vehicles, name='api_vehicles'),
     path('api/drivers/', views.api_drivers, name='api_drivers'),
+
+    # Equipment Combinations
+path('combinations/', views.combination_list, name='combination_list'),
+path('combinations/create/', views.combination_create, name='combination_create'),
+path('combinations/<int:combination_id>/edit/', views.combination_edit, name='combination_edit'),
+path('combinations/<int:combination_id>/delete/', views.combination_delete, name='combination_delete'),
+
 ]
 

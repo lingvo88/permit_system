@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+
+{% block title %}Equipment Combinations - PermitPro{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Equipment Combinations</h1>
+    <p class="subtitle">Manage saved driver, truck, and trailer combinations</p>
+</div>
+
+<div class="mb-4">
+    <a href="{% url 'fleet:combination_create' %}" class="btn btn-primary">
+        <i class="bi bi-plus-circle me-2"></i>Create New Combination
+    </a>
+    <a href="{% url 'fleet:list' %}" class="btn btn-secondary">
+        <i class="bi bi-arrow-left me-2"></i>Back to Fleet
+    </a>
+</div>
+
+<div class="card fade-in">
+    <div class="card-body">
+        {% if combinations %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Driver</th>
+                            <th>Truck</th>
+                            <th>Trailer</th>
+                            <th>Default</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for combination in combinations %}
+                        <tr>
+                            <td>
+                                <strong>{{ combination.driver.full_name }}</strong>
+                                {% if combination.is_default %}
+                                    <span class="badge bg-primary ms-2">Default</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ combination.truck.unit_number|default:"-" }}</td>
+                            <td>{{ combination.trailer.unit_number|default:"-" }}</td>
+                            <td>
+                                {% if combination.is_default %}
+                                    <i class="bi bi-check-circle-fill text-success"></i>
+                                {% else %}
+                                    <i class="bi bi-circle text-muted"></i>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="{% url 'fleet:combination_edit' combination.id %}" class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-pencil"></i> Edit
+                                </a>
+                                <a href="{% url 'fleet:combination_delete' combination.id %}" class="btn btn-sm btn-outline-danger">
+                                    <i class="bi bi-trash"></i> Delete
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="text-center py-5">
+                <i class="bi bi-inbox" style="font-size: 3rem; color: #ccc;"></i>
+                <p class="text-muted mt-3">No equipment combinations yet. Create one to save time on permit requests!</p>
+                <a href="{% url 'fleet:combination_create' %}" class="btn btn-primary mt-2">
+                    <i class="bi bi-plus-circle me-2"></i>Create Your First Combination
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -9,9 +9,14 @@
 </div>
 
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <a href="{% url 'fleet:vehicle_add' %}?type=truck" class="btn btn-success">
-        <i class="bi bi-plus-circle me-2"></i>Add New Vehicle
-    </a>
+    <div>
+        <a href="{% url 'fleet:vehicle_add' %}?type=truck" class="btn btn-success">
+            <i class="bi bi-plus-circle me-2"></i>Add New Vehicle
+        </a>
+        <a href="{% url 'fleet:combination_list' %}" class="btn btn-info">
+            <i class="bi bi-gear me-2"></i>Equipment Combinations
+        </a>
+    </div>
     <a href="{% url 'dashboard:customer_dashboard' %}" class="btn btn-outline-light">
         Back to Dashboard
     </a>

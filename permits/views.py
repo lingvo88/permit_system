@@ -74,56 +74,74 @@ def permit_create(request):
     
     company = request.user.company
     
+    # Get equipment combinations
+    from fleet.models import EquipmentCombination
+    combinations = EquipmentCombination.objects.filter(company=company)
+    default_combination = combinations.filter(is_default=True).first()
+    
     if request.method == 'POST':
         form = PermitRequestForm(request.POST, company=company)
-        state_formset = PermitStateFormSet(request.POST, prefix='states')
         
         if form.is_valid():
             permit = form.save(commit=False)
             permit.company = company
-            permit.submitted_by = request.user
+            permit.customer = request.user
             
-            # Check if submitting or saving as draft
-            if 'submit' in request.POST:
-                permit.status = PermitRequest.Status.PENDING
-                permit.submitted_at = timezone.now()
-            else:
+            # Set status based on which button was clicked
+            if 'draft' in request.POST:
                 permit.status = PermitRequest.Status.DRAFT
+            else:
+                permit.status = PermitRequest.Status.SUBMITTED
+                # Send email notification
+                try:
+                    send_permit_notification(permit)
+                except Exception as e:
+                    messages.warning(request, f'Permit created but email notification failed: {str(e)}')
             
             permit.save()
             
-            # Handle states from POST data
-            states_data = request.POST.getlist('selected_states[]')
-            for state_code in states_data:
+            # Handle state selections
+            selected_states = request.POST.getlist('selected_states[]')
+            for state_code in selected_states:
                 if state_code:
-                    # Get the travel date, convert empty string to None
-                    travel_date = request.POST.get(f'state_date_{state_code}')
-                    if travel_date == '':
-                        travel_date = None
+                    date_key = f'state_date_{state_code}'
+                    route_key = f'state_route_{state_code}'
+                    comments_key = f'state_comments_{state_code}'
                     
                     PermitState.objects.create(
                         permit=permit,
                         state=state_code,
-                        travel_date=travel_date,
-                        route=request.POST.get(f'state_route_{state_code}', ''),
-                        comments=request.POST.get(f'state_comments_{state_code}', ''),
+                        travel_date=request.POST.get(date_key) or None,
+                        route=request.POST.get(route_key, ''),
+                        comments=request.POST.get(comments_key, '')
                     )
             
-            if permit.status == PermitRequest.Status.PENDING:
-                messages.success(request, f'Permit #{permit.permit_number} submitted successfully.')
+            if 'draft' in request.POST:
+                messages.success(request, 'Permit saved as draft.')
             else:
-                messages.success(request, f'Permit #{permit.permit_number} saved as draft.')
-            return redirect('permits:detail', permit_id=permit.id)
+                messages.success(request, 'Permit request submitted successfully!')
+            
+            return redirect('dashboard:customer_dashboard')
     else:
-        form = PermitRequestForm(company=company)
-        state_formset = PermitStateFormSet(prefix='states')
+        # Pre-populate with default combination if it exists
+        initial = {}
+        if default_combination:
+            initial = {
+                'driver': default_combination.driver,
+                'truck': default_combination.truck,
+                'trailer': default_combination.trailer,
+            }
+        form = PermitRequestForm(company=company, initial=initial)
+    
+    state_choices = PermitState.US_STATES
     
     return render(request, 'permits/form.html', {
         'form': form,
-        'state_formset': state_formset,
         'company': company,
+        'state_choices': state_choices,
         'title': 'New Permit Request',
-        'state_choices': PermitState.US_STATES,
+        'combinations': combinations,
+        'default_combination': default_combination,
     })
 
 
