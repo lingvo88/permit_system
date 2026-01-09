@@ -831,6 +831,9 @@ function addStateRow(stateCode = '', date = '', route = '', comments = '') {
 // ============================================
 // MAP INITIALIZATION
 // ============================================
+// ============================================
+// MAP INITIALIZATION
+// ============================================
 d3.json("https://cdn.jsdelivr.net/npm/us-atlas@3/states-albers-10m.json").then(function(us) {
     console.log("Map data loaded:", us);
     const width = 975;
@@ -852,9 +855,13 @@ d3.json("https://cdn.jsdelivr.net/npm/us-atlas@3/states-albers-10m.json").then(f
     // Create a group for states
     const statesGroup = svg.append("g").attr("class", "states-group");
     
-    // Create a group for labels (numbers) - renders on top of states
+    // Create a group for state abbreviation labels
+    const stateLabelsGroup = svg.append("g").attr("class", "state-labels-group");
+    
+    // Create a group for selection number labels - renders on top
     const labelsGroup = svg.append("g").attr("class", "labels-group");
     
+    // Draw state paths
     statesGroup.selectAll("path")
         .data(topojson.feature(us, us.objects.states).features)
         .enter()
@@ -899,9 +906,36 @@ d3.json("https://cdn.jsdelivr.net/npm/us-atlas@3/states-albers-10m.json").then(f
         .attr("stroke", "#fff")
         .attr("stroke-linejoin", "round")
         .attr("d", path);
+    
+    // Add state abbreviation labels
+    const features = topojson.feature(us, us.objects.states).features;
+    
+    features.forEach(feature => {
+        const stateCode = stateData[feature.id];
+        if (stateCode) {
+            const centroid = path.centroid(feature);
+            
+            // Skip if centroid is invalid
+            if (isNaN(centroid[0]) || isNaN(centroid[1])) return;
+            
+            stateLabelsGroup.append("text")
+                .attr("x", centroid[0])
+                .attr("y", centroid[1])
+                .attr("text-anchor", "middle")
+                .attr("dominant-baseline", "central")
+                .attr("font-size", "10px")
+                .attr("font-weight", "600")
+                .attr("fill", "#555")
+                .attr("pointer-events", "none")
+                .attr("class", "state-abbr-label")
+                .attr("data-state", stateCode)
+                .text(stateCode);
+        }
+    });
         
-    // Store references globally for updating labels
+    // Store references globally for updating selection numbers
     window.mapLabelsGroup = labelsGroup;
+    window.mapStateLabelsGroup = stateLabelsGroup;
     window.mapPath = path;
     window.mapUs = us;
         
