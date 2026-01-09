@@ -81,11 +81,25 @@ def permit_create(request):
     
     if request.method == 'POST':
         form = PermitRequestForm(request.POST, company=company)
-        
+        print("Form errors:", form.errors)
+
         if form.is_valid():
             permit = form.save(commit=False)
             permit.company = company
-            permit.customer = request.user
+            permit.submitted_by = request.user
+            
+            # Handle axle weights from raw POST data (must be before save)
+            for i in range(1, 10):
+                weight_val = request.POST.get(f'axle_weight_{i}', '') or 0
+                setattr(permit, f'axle_weight_{i}', int(weight_val) if weight_val else 0)
+                
+                tires_val = request.POST.get(f'tires_per_axle_{i}', '') or 0
+                setattr(permit, f'tires_per_axle_{i}', int(tires_val) if tires_val else 0)
+
+            # Handle spacings
+            for spacing in ['1_2', '2_3', '3_4', '4_5', '5_6', '6_7', '7_8', '8_9']:
+                spacing_val = request.POST.get(f'spacing_{spacing}', '') or 0
+                setattr(permit, f'spacing_{spacing}', float(spacing_val) if spacing_val else 0)
             
             # Set status based on which button was clicked
             if 'draft' in request.POST:
@@ -93,24 +107,6 @@ def permit_create(request):
             else:
                 permit.status = PermitRequest.Status.PENDING
                 permit.submitted_at = timezone.now()
-                # Send email notification
-                try:
-                    send_permit_notification(permit)
-                except Exception as e:
-                    messages.warning(request, f'Permit created but email notification failed: {str(e)}')
-
-                # Handle axle weights from raw POST data
-                for i in range(1, 10):
-                    weight_val = request.POST.get(f'axle_weight_{i}', '') or 0
-                    setattr(permit, f'axle_weight_{i}', int(weight_val) if weight_val else 0)
-                    
-                    tires_val = request.POST.get(f'tires_per_axle_{i}', '') or 0
-                    setattr(permit, f'tires_per_axle_{i}', int(tires_val) if tires_val else 0)
-
-                # Handle spacings
-                for spacing in ['1_2', '2_3', '3_4', '4_5', '5_6', '6_7', '7_8', '8_9']:
-                    spacing_val = request.POST.get(f'spacing_{spacing}', '') or 0
-                    setattr(permit, f'spacing_{spacing}', float(spacing_val) if spacing_val else 0)
             
             permit.save()
             
@@ -130,10 +126,11 @@ def permit_create(request):
                         comments=request.POST.get(comments_key, '')
                     )
             
-            if 'draft' in request.POST:
-                messages.success(request, 'Permit saved as draft.')
-            else:
+            # Send email notification (after save, only for submitted permits)
+            if 'draft' not in request.POST:
                 messages.success(request, 'Permit request submitted successfully!')
+            else:
+                messages.success(request, 'Permit saved as draft.')
             
             return redirect('dashboard:customer_dashboard')
     else:

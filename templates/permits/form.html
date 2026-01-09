@@ -395,11 +395,12 @@ input[type=number] {
                             </div>
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label">Gross Weight</label>
+                            <label class="form-label">Gross Weight *</label>
                             <div class="d-flex align-items-center gap-2">
-                                <input type="number" id="id_gross_weight" name="gross_weight" class="form-control" placeholder="0" readonly style="width: 150px;">
+                                <input type="number" id="id_gross_weight" name="gross_weight" class="form-control" placeholder="0" style="width: 150px;">
                                 <span class="text-muted">lbs</span>
                             </div>
+                            <small class="text-muted">Auto-calculated from axle weights above</small>
                         </div>
                     </div>
 
@@ -1032,5 +1033,25 @@ if (combinationSelector) {
         }
     });
 }
+// Legal weight checkbox auto-fill
+document.getElementById('id_is_legal_weight')?.addEventListener('change', function() {
+    if (this.checked) {
+        // Auto-fill axle weights for legal weight
+        document.querySelector('input[name="axle_weight_1"]').value = 12000;
+        document.querySelector('input[name="axle_weight_2"]').value = 17000;
+        document.querySelector('input[name="axle_weight_3"]').value = 17000;
+        document.querySelector('input[name="axle_weight_4"]').value = 17000;
+        document.querySelector('input[name="axle_weight_5"]').value = 17000;
+        
+        // Clear remaining axles
+        document.querySelector('input[name="axle_weight_6"]').value = '';
+        document.querySelector('input[name="axle_weight_7"]').value = '';
+        document.querySelector('input[name="axle_weight_8"]').value = '';
+        document.querySelector('input[name="axle_weight_9"]').value = '';
+        
+        // Set gross weight
+        document.getElementById('id_gross_weight').value = 80000;
+    }
+});
 </script>
 {% endblock %}
