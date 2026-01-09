@@ -91,7 +91,8 @@ def permit_create(request):
             if 'draft' in request.POST:
                 permit.status = PermitRequest.Status.DRAFT
             else:
-                permit.status = PermitRequest.Status.SUBMITTED
+                permit.status = PermitRequest.Status.PENDING
+                permit.submitted_at = timezone.now()
                 # Send email notification
                 try:
                     send_permit_notification(permit)
