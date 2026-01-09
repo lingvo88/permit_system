@@ -147,7 +147,14 @@ input[type=number] {
         <div class="row mt-3 {% if not combinations %}pt-3 border-top border-light{% endif %}">
             <div class="col-md-6">
                 <label class="form-label text-white-50">Driver</label>
-                {{ form.driver }}
+                <select name="driver" id="id_driver" class="form-select">
+                    <option value="">---------</option>
+                    {% for driver in form.driver.field.queryset %}
+                    <option value="{{ driver.id }}" data-email="{{ driver.email|default:'-' }}" {% if form.driver.value|stringformat:"i" == driver.id|stringformat:"i" %}selected{% endif %}>
+                        {{ driver.full_name }}
+                    </option>
+                    {% endfor %}
+                </select>
             </div>
             <div class="col-md-6">
                 <label class="form-label text-white-50">Driver Email</label>
@@ -975,8 +982,17 @@ document.getElementById('clearMapBtn')?.addEventListener('click', function() {
 
 // Update driver email when driver changes
 document.getElementById('id_driver')?.addEventListener('change', function() {
-    const option = this.options[this.selectedIndex];
-    document.getElementById('driverEmail').value = option.text.includes('@') ? option.text : '-';
+    const selectedOption = this.options[this.selectedIndex];
+    const email = selectedOption.dataset.email || '-';
+    document.getElementById('driverEmail').value = email;
+});
+
+// Trigger on page load if driver is pre-selected
+document.addEventListener('DOMContentLoaded', function() {
+    const driverSelect = document.getElementById('id_driver');
+    if (driverSelect && driverSelect.value) {
+        driverSelect.dispatchEvent(new Event('change'));
+    }
 });
 
 // ============================================
