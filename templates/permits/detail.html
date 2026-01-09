@@ -27,7 +27,8 @@
                         <p><strong>Destination:</strong> {{ permit.destination_address }}</p>
                     </div>
                     <div class="col-md-6">
-                        <p><strong>Driver:</strong> {{ permit.driver|default:"-" }}</p>
+                        <p><strong>Driver:</strong> {{ permit.driver.full_name|default:"-" }}</p>
+                        <p><strong>Driver Email:</strong> {{ permit.driver.email|default:"-" }}</p>
                         <p><strong>Truck:</strong> {{ permit.truck|default:"-" }}</p>
                         <p><strong>Trailer:</strong> {{ permit.trailer|default:"-" }}</p>
                     </div>

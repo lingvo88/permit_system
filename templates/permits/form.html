@@ -166,6 +166,9 @@ input[type=number] {
 
 <form method="post" id="permitForm">
     {% csrf_token %}
+    
+    <!-- Hidden driver field that gets submitted -->
+    <input type="hidden" name="driver" id="hidden_driver" value="">
 
     <div class="row g-4">
         <div class="col-lg-9">
@@ -182,7 +185,6 @@ input[type=number] {
                 {{ form.trailer }}
             </div>
         </div>
-
         <hr>
 
         <div class="row g-3">
@@ -1069,5 +1071,28 @@ document.getElementById('id_is_legal_weight')?.addEventListener('change', functi
         document.getElementById('id_gross_weight').value = 80000;
     }
 });
+// Sync driver selection to hidden field
+document.getElementById('id_driver')?.addEventListener('change', function() {
+    document.getElementById('hidden_driver').value = this.value;
+});
+
+// Also sync on page load
+document.addEventListener('DOMContentLoaded', function() {
+    const driverSelect = document.getElementById('id_driver');
+    const hiddenDriver = document.getElementById('hidden_driver');
+    if (driverSelect && hiddenDriver) {
+        hiddenDriver.value = driverSelect.value;
+    }
+});
+
+// Update hidden field when combination is selected
+const existingCombinationHandler = document.getElementById('combinationSelector');
+if (existingCombinationHandler) {
+    existingCombinationHandler.addEventListener('change', function() {
+        setTimeout(() => {
+            document.getElementById('hidden_driver').value = document.getElementById('id_driver').value;
+        }, 100);
+    });
+}
 </script>
 {% endblock %}

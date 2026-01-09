@@ -49,7 +49,8 @@
                         <p><strong>Destination:</strong> {{ permit.destination_address }}</p>
                     </div>
                     <div class="col-md-6">
-                        <p><strong>Driver:</strong> {{ permit.driver|default:"-" }}</p>
+                        <p><strong>Driver:</strong> {{ permit.driver.full_name|default:"-" }}</p>
+                        <p><strong>Driver Email:</strong> {{ permit.driver.email|default:"-" }}</p>
                         <p><strong>Truck:</strong> {{ permit.truck|default:"-" }}</p>
                         <p><strong>Trailer:</strong> {{ permit.trailer|default:"-" }}</p>
                     </div>
@@ -126,9 +127,10 @@
                 <form method="post" action="{% url 'dashboard:send_email' permit.id %}" enctype="multipart/form-data">
                     {% csrf_token %}
                     <div class="mb-3">
-                        <label class="form-label">Recipient Email</label>
-                        <input type="email" name="recipient" class="form-control" value="{{ permit.company.email }}">
-                    </div>
+                            <label class="form-label">Recipient Emails</label>
+                            <input type="text" name="recipient" class="form-control" value="{{ permit.company.email }}{% if permit.driver.email %}, {{ permit.driver.email }}{% endif %}">
+                            <small class="text-muted">Separate multiple emails with commas</small>
+                        </div>
                     <div class="mb-3">
                         <label class="form-label">Subject</label>
                         <input type="text" name="subject" class="form-control" value="Regarding Permit #{{ permit.permit_number }}">
