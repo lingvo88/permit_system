@@ -112,7 +112,7 @@ def permit_create(request):
             
             # Handle state selections
             selected_states = request.POST.getlist('selected_states[]')
-            for state_code in selected_states:
+            for index, state_code in enumerate(selected_states):
                 if state_code:
                     date_key = f'state_date_{state_code}'
                     route_key = f'state_route_{state_code}'
@@ -121,6 +121,7 @@ def permit_create(request):
                     PermitState.objects.create(
                         permit=permit,
                         state=state_code,
+                        order=index,  # ADD THIS LINE
                         travel_date=request.POST.get(date_key) or None,
                         route=request.POST.get(route_key, ''),
                         comments=request.POST.get(comments_key, '')
@@ -197,6 +198,7 @@ def permit_edit(request, permit_id):
                     PermitState.objects.create(
                         permit=permit,
                         state=state_code,
+                        order=index,
                         travel_date=request.POST.get(f'state_date_{state_code}') or None,
                         route=request.POST.get(f'state_route_{state_code}', ''),
                         comments=request.POST.get(f'state_comments_{state_code}', ''),

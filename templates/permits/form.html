@@ -364,31 +364,7 @@ input[type=number] {
                         </div>
                     </div>
 
-                    <div class="row g-3 mb-3">
-                        <div class="col-md-4">
-                            <label class="form-label">Overall Length</label>
-                            <div class="dimension-group">
-                                {{ form.overall_length_ft }}<span>ft</span>
-                                {{ form.overall_length_in }}<span>in</span>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Overall Width</label>
-                            <div class="dimension-group">
-                                {{ form.overall_width_ft }}<span>ft</span>
-                                {{ form.overall_width_in }}<span>in</span>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Overall Height</label>
-                            <div class="dimension-group">
-                                {{ form.overall_height_ft }}<span>ft</span>
-                                {{ form.overall_height_in }}<span>in</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row g-3 mb-3">
+                   <div class="row g-3 mb-3">
                         <div class="col-md-4">
                             <label class="form-label">Front Overhang</label>
                             <div class="dimension-group">
@@ -409,23 +385,30 @@ input[type=number] {
                                 <input type="number" id="id_gross_weight" name="gross_weight" class="form-control" placeholder="0" style="width: 150px;">
                                 <span class="text-muted">lbs</span>
                             </div>
-                            <small class="text-muted">Auto-calculated from axle weights above</small>
+                            <small class="text-muted">Auto-calculated from axle weights</small>
                         </div>
                     </div>
 
                     <div class="row g-3">
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label class="form-label">Left Overhang</label>
                             <div class="dimension-group">
                                 {{ form.left_overhang_ft }}<span>ft</span>
                                 {{ form.left_overhang_in }}<span>in</span>
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label class="form-label">Right Overhang</label>
                             <div class="dimension-group">
                                 {{ form.right_overhang_ft }}<span>ft</span>
                                 {{ form.right_overhang_in }}<span>in</span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Kingpin to Rear Axle</label>
+                            <div class="dimension-group">
+                                {{ form.kingpin_to_rear_ft }}<span>ft</span>
+                                {{ form.kingpin_to_rear_in }}<span>in</span>
                             </div>
                         </div>
                     </div>

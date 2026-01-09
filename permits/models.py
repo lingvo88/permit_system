@@ -95,6 +95,9 @@ class PermitRequest(models.Model):
     left_overhang_in = models.PositiveIntegerField(default=0)
     right_overhang_ft = models.PositiveIntegerField(default=0)
     right_overhang_in = models.PositiveIntegerField(default=0)
+    # Kingpin to rear axle
+    kingpin_to_rear_ft = models.PositiveIntegerField(default=0)
+    kingpin_to_rear_in = models.PositiveIntegerField(default=0)
     
     # Axle configuration for this permit
     axle_configuration = models.PositiveIntegerField(default=1)  # Which config to use
@@ -212,12 +215,13 @@ class PermitState(models.Model):
         related_name='states'
     )
     state = models.CharField(max_length=2, choices=US_STATES)
+    order = models.PositiveIntegerField(default=0)
     travel_date = models.DateField(null=True, blank=True)
     route = models.TextField(blank=True)
     comments = models.TextField(blank=True)
     
     class Meta:
-        ordering = ['state']
+        ordering = ['order']
         unique_together = ['permit', 'state']
     
     def __str__(self):
