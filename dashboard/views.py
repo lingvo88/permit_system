@@ -190,7 +190,6 @@ def send_email(request, permit_id):
 ---
 Best regards,
 
-PermitPro Team
 Big Rig Permits
 Email: bigrigpermitsinc@gmail.com
 Phone: (773) 992-0771
