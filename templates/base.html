@@ -496,6 +496,262 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     
     {% block extra_js %}{% endblock %}
+
+    <!-- Truck Animation Easter Egg (Click hidden egg that appears every 420 seconds) -->
+    <script>
+    (function() {
+        function showEasterEgg() {
+            // Don't show if egg already exists
+            if (document.getElementById('hidden-egg')) return;
+            
+            const egg = document.createElement('div');
+            egg.id = 'hidden-egg';
+            egg.innerHTML = '🥚';
+            egg.title = 'Click me!';
+            
+            // Random side (left or right)
+            const side = Math.random() < 0.5 ? 'left' : 'right';
+            
+            // Random vertical position (20% to 80% of viewport)
+            const topPosition = 20 + Math.random() * 60;
+            
+            egg.style.cssText = `
+                position: fixed;
+                ${side}: 10px;
+                top: ${topPosition}%;
+                font-size: 24px;
+                cursor: pointer;
+                z-index: 9999;
+                opacity: 0.7;
+                transition: opacity 0.3s, transform 0.3s;
+                animation: eggBounce 2s ease-in-out infinite;
+            `;
+            
+            // Add hover effect
+            egg.addEventListener('mouseenter', () => {
+                egg.style.opacity = '1';
+                egg.style.transform = 'scale(1.2)';
+            });
+            egg.addEventListener('mouseleave', () => {
+                egg.style.opacity = '0.7';
+                egg.style.transform = 'scale(1)';
+            });
+            
+            // Click to launch truck
+            egg.addEventListener('click', () => {
+                egg.remove();
+                launchTruck();
+            });
+            
+            document.body.appendChild(egg);
+            
+            // Add bounce animation
+            if (!document.getElementById('egg-style')) {
+                const style = document.createElement('style');
+                style.id = 'egg-style';
+                style.textContent = `
+                    @keyframes eggBounce {
+                        0%, 100% { transform: translateY(0); }
+                        50% { transform: translateY(-10px); }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+            
+            // Remove egg after 15 seconds if not clicked
+            setTimeout(() => {
+                if (document.getElementById('hidden-egg')) {
+                    egg.style.opacity = '0';
+                    setTimeout(() => egg.remove(), 300);
+                }
+            }, 15000);
+        }
+        
+        function launchTruck() {
+            if (document.getElementById('easter-truck')) return;
+
+            const truck = document.createElement('div');
+            truck.id = 'easter-truck';
+            truck.innerHTML = `
+                <div class="truck-container">
+                    <div class="truck-cab">
+                        <div class="cab-window"></div>
+                        <div class="cab-door"></div>
+                        <div class="exhaust"></div>
+                    </div>
+                    <div class="truck-trailer">
+                        <div class="trailer-text">BIG RIG PERMITS</div>
+                        <div class="trailer-stripe"></div>
+                    </div>
+                    <div class="wheel wheel-1"></div>
+                    <div class="wheel wheel-2"></div>
+                    <div class="wheel wheel-3"></div>
+                    <div class="wheel wheel-4"></div>
+                </div>
+            `;
+            document.body.appendChild(truck);
+
+            const style = document.createElement('style');
+            style.id = 'easter-truck-style';
+            style.textContent = `
+                #easter-truck {
+                    position: fixed;
+                    bottom: 50px;
+                    right: -400px;
+                    z-index: 99999;
+                    animation: driveTruck 6s linear forwards;
+                    pointer-events: none;
+                }
+                
+                @keyframes driveTruck {
+                    0% { right: -400px; }
+                    100% { right: calc(100% + 50px); }
+                }
+                
+                .truck-container {
+                    position: relative;
+                    width: 350px;
+                    height: 120px;
+                }
+                
+                .truck-cab {
+                    position: absolute;
+                    left: 0;
+                    bottom: 20px;
+                    width: 90px;
+                    height: 80px;
+                    background: linear-gradient(135deg, #1a5f7a 0%, #17a2b8 100%);
+                    border-radius: 10px 10px 0 0;
+                    box-shadow: inset -5px 0 10px rgba(0,0,0,0.2);
+                }
+                
+                .cab-window {
+                    position: absolute;
+                    top: 10px;
+                    left: 10px;
+                    width: 50px;
+                    height: 35px;
+                    background: linear-gradient(135deg, #87CEEB 0%, #5c94fc 100%);
+                    border-radius: 5px;
+                    border: 3px solid #0d4f6a;
+                }
+                
+                .cab-door {
+                    position: absolute;
+                    bottom: 5px;
+                    left: 15px;
+                    width: 40px;
+                    height: 30px;
+                    background: #138496;
+                    border-radius: 3px;
+                    border: 2px solid #0d4f6a;
+                }
+                
+                .truck-trailer {
+                    position: absolute;
+                    right: 0;
+                    bottom: 20px;
+                    width: 260px;
+                    height: 90px;
+                    background: linear-gradient(180deg, #f8f9fa 0%, #e9ecef 100%);
+                    border-radius: 5px;
+                    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+                    border: 3px solid #dee2e6;
+                    overflow: hidden;
+                }
+                
+                .trailer-text {
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    font-family: 'Arial Black', sans-serif;
+                    font-size: 18px;
+                    font-weight: bold;
+                    color: #17a2b8;
+                    text-shadow: 1px 1px 0 #fff;
+                    white-space: nowrap;
+                }
+                
+                .trailer-stripe {
+                    position: absolute;
+                    bottom: 0;
+                    left: 0;
+                    right: 0;
+                    height: 15px;
+                    background: linear-gradient(90deg, #17a2b8 0%, #138496 50%, #17a2b8 100%);
+                }
+                
+                .wheel {
+                    position: absolute;
+                    bottom: 0;
+                    width: 40px;
+                    height: 40px;
+                    background: radial-gradient(circle, #444 60%, #222 60%, #222 80%, #444 80%);
+                    border-radius: 50%;
+                    border: 4px solid #333;
+                    animation: spin 0.3s linear infinite;
+                }
+                
+                @keyframes spin {
+                    from { transform: rotate(0deg); }
+                    to { transform: rotate(-360deg); }
+                }
+                
+                .wheel-1 { left: 10px; }
+                .wheel-2 { left: 50px; }
+                .wheel-3 { right: 50px; }
+                .wheel-4 { right: 10px; }
+                
+                .exhaust {
+                    position: absolute;
+                    left: 75px;
+                    bottom: 65px;
+                    width: 10px;
+                    height: 20px;
+                    background: #444;
+                    border-radius: 3px;
+                }
+                
+                .exhaust::after {
+                    content: '';
+                    position: absolute;
+                    top: -15px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    width: 20px;
+                    height: 20px;
+                    background: rgba(150, 150, 150, 0.6);
+                    border-radius: 50%;
+                    animation: smoke 0.5s ease-out infinite;
+                }
+                
+                @keyframes smoke {
+                    0% {
+                        opacity: 0.8;
+                        transform: translateX(-50%) translateY(0) scale(0.5);
+                    }
+                    100% {
+                        opacity: 0;
+                        transform: translateX(-50%) translateY(-30px) scale(1.5);
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+
+            setTimeout(() => {
+                truck.remove();
+                style.remove();
+            }, 6500);
+        }
+        
+        // Show egg every 420 seconds (7 minutes)
+        setInterval(showEasterEgg, 420000);
+        
+        // Also show first egg after 420 seconds
+        setTimeout(showEasterEgg, 420000);
+    })();
+    </script>
 </body>
 </html>
 
