@@ -50,13 +50,14 @@
                         <p><strong>Serial#:</strong> {{ permit.load_serial|default:"-" }}</p>
                     </div>
                     <div class="col-md-3">
-                        <p><strong>Cargo Length:</strong> {{ permit.load_length|default:"-" }}</p>
+                        <div class="col-md-3">
+                        <p><strong>Cargo Length:</strong> {{ permit.load_length_ft|default:0 }}' {{ permit.load_length_in|default:0 }}"</p>
                     </div>
                     <div class="col-md-3">
-                        <p><strong>Cargo Width:</strong> {{ permit.load_width|default:"-" }}</p>
+                        <p><strong>Cargo Width:</strong> {{ permit.load_width_ft|default:0 }}' {{ permit.load_width_in|default:0 }}"</p>
                     </div>
                     <div class="col-md-3">
-                        <p><strong>Cargo Height:</strong> {{ permit.load_height|default:"-" }}</p>
+                        <p><strong>Cargo Height:</strong> {{ permit.load_height_ft|default:0 }}' {{ permit.load_height_in|default:0 }}"</p>
                     </div>
                     <div class="col-md-3">
                         <p><strong>Cargo Weight:</strong> {{ permit.load_weight|default:"-" }} lbs</p>

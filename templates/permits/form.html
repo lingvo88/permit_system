@@ -207,18 +207,27 @@ input[type=number] {
         <div class="row g-3">
             <div class="col-md-3">
                 <label class="form-label">Length</label>
-                {{ form.load_length }}
+                <div class="dimension-group">
+                    {{ form.load_length_ft }}<span>ft</span>
+                    {{ form.load_length_in }}<span>in</span>
+                </div>
             </div>
             <div class="col-md-3">
                 <label class="form-label">Width</label>
-                {{ form.load_width }}
+                <div class="dimension-group">
+                    {{ form.load_width_ft }}<span>ft</span>
+                    {{ form.load_width_in }}<span>in</span>
+                </div>
             </div>
             <div class="col-md-3">
                 <label class="form-label">Height</label>
-                {{ form.load_height }}
+                <div class="dimension-group">
+                    {{ form.load_height_ft }}<span>ft</span>
+                    {{ form.load_height_in }}<span>in</span>
+                </div>
             </div>
             <div class="col-md-3">
-                <label class="form-label">Weight</label>
+                <label class="form-label">Weight (lbs)</label>
                 {{ form.load_weight }}
             </div>
         </div>
