@@ -49,20 +49,20 @@
                     <div class="col-md-4">
                         <p><strong>Serial#:</strong> {{ permit.load_serial|default:"-" }}</p>
                     </div>
-                    <div class="col-md-3">
+                    <div class="row g-3">
                         <div class="col-md-3">
-                        <p><strong>Cargo Length:</strong> {{ permit.load_length_ft|default:0 }}' {{ permit.load_length_in|default:0 }}"</p>
+                            <p><strong>Cargo Length:</strong> {{ permit.load_length_ft|default:0 }}' {{ permit.load_length_in|default:0 }}"</p>
+                        </div>
+                        <div class="col-md-3">
+                            <p><strong>Cargo Width:</strong> {{ permit.load_width_ft|default:0 }}' {{ permit.load_width_in|default:0 }}"</p>
+                        </div>
+                        <div class="col-md-3">
+                            <p><strong>Cargo Height:</strong> {{ permit.load_height_ft|default:0 }}' {{ permit.load_height_in|default:0 }}"</p>
+                        </div>
+                        <div class="col-md-3">
+                            <p><strong>Cargo Weight:</strong> {{ permit.load_weight|default:0 }} lbs</p>
+                        </div>
                     </div>
-                    <div class="col-md-3">
-                        <p><strong>Cargo Width:</strong> {{ permit.load_width_ft|default:0 }}' {{ permit.load_width_in|default:0 }}"</p>
-                    </div>
-                    <div class="col-md-3">
-                        <p><strong>Cargo Height:</strong> {{ permit.load_height_ft|default:0 }}' {{ permit.load_height_in|default:0 }}"</p>
-                    </div>
-                    <div class="col-md-3">
-                        <p><strong>Cargo Weight:</strong> {{ permit.load_weight|default:"-" }} lbs</p>
-                    </div>
-                </div>
                 {% if permit.load_detailed_description %}
                 <div class="row g-3 mt-2">
                     <div class="col-12">
