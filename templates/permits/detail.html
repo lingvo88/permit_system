@@ -252,6 +252,43 @@
             </div>
         </div>
         {% endif %}
+
+
+        <!-- Email History & Attachments -->
+        {% if permit.email_logs.exists %}
+        <div class="card mb-4 fade-in">
+            <div class="card-header">
+                <i class="bi bi-envelope me-2"></i>Email History & Documents
+            </div>
+            <div class="card-body">
+                {% for email_log in permit.email_logs.all %}
+                <div class="border-bottom pb-3 mb-3">
+                    <div class="d-flex justify-content-between">
+                        <strong>{{ email_log.subject }}</strong>
+                        <small class="text-muted">{{ email_log.sent_at|date:"m/d/Y H:i" }}</small>
+                    </div>
+                    <small class="text-muted">From: {{ email_log.sent_by.get_full_name|default:email_log.sent_by.email }}</small>
+                    
+                    {% if email_log.attachment_files.exists %}
+                    <div class="mt-2">
+                        <small class="text-muted">Attachments:</small>
+                        <div class="list-group mt-1">
+                            {% for attachment in email_log.attachment_files.all %}
+                            <a href="{% url 'dashboard:download_email_attachment' attachment.id %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-2">
+                                <span>
+                                    <i class="bi bi-file-earmark me-2"></i>{{ attachment.filename }}
+                                </span>
+                                <span class="badge bg-primary">Download</span>
+                            </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
         
         <!-- Comments -->
         <div class="card fade-in">

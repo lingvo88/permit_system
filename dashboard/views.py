@@ -12,6 +12,7 @@ from permits.models import PermitRequest, PermitDocument, PermitComment
 from permits.forms import PermitStatusForm, EmailForm, PermitDocumentForm
 from company.models import Company
 from .models import EmailLog, EmailAttachment
+from django.http import FileResponse
 
 
 @login_required
@@ -333,3 +334,20 @@ def company_detail_employee(request, company_id):
         'drivers': drivers,
     })
 
+@login_required
+def download_email_attachment(request, attachment_id):
+    """Download an email attachment."""
+    
+    attachment = get_object_or_404(EmailAttachment, pk=attachment_id)
+    
+    # Check access - customer can only download attachments from their permits
+    if request.user.is_customer:
+        if attachment.email_log.permit.company != request.user.company:
+            messages.error(request, 'Access denied.')
+            return redirect('dashboard:index')
+    
+    return FileResponse(
+        attachment.file.open('rb'),
+        as_attachment=True,
+        filename=attachment.filename
+    )
