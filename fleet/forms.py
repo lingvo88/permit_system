@@ -37,6 +37,17 @@ class VehicleForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         
+        # Make fields required
+        self.fields['unit_number'].required = True
+        self.fields['num_axles'].required = True
+        self.fields['year'].required = True
+        self.fields['make'].required = True
+        self.fields['plate'].required = True
+        self.fields['plate_state'].required = True
+        self.fields['vin'].required = True
+        self.fields['length_ft'].required = True
+        self.fields['length_in'].required = False  # inches not required
+        
         # Load existing axle count if editing
         if self.instance and self.instance.pk:
             config = self.instance.axle_configurations.first()
