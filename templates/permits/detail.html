@@ -30,32 +30,167 @@
                         <p><strong>Driver:</strong> {{ permit.driver.full_name|default:"-" }}</p>
                         <p><strong>Driver Email:</strong> {{ permit.driver.email|default:"-" }}</p>
                         <p><strong>Truck:</strong> {{ permit.truck|default:"-" }}</p>
+                        <p><strong>Truck VIN:</strong> {{ permit.truck.vin|default:"-" }}</p>
                         <p><strong>Trailer:</strong> {{ permit.trailer|default:"-" }}</p>
+                        <p><strong>Trailer VIN:</strong> {{ permit.trailer.vin|default:"-" }}</p>
                     </div>
                 </div>
                 
                 <hr>
                 
-                <h6 class="mb-3">Dimensions</h6>
+                <h6 class="mb-3">Cargo Information</h6>
                 <div class="row g-3">
                     <div class="col-md-4">
-                        <p><strong>Length:</strong> {{ permit.overall_length_ft }}' {{ permit.overall_length_in }}"</p>
+                        <p><strong>Cargo:</strong> {{ permit.load_description|default:"-" }}</p>
                     </div>
                     <div class="col-md-4">
-                        <p><strong>Width:</strong> {{ permit.overall_width_ft }}' {{ permit.overall_width_in }}"</p>
+                        <p><strong>Make/Model:</strong> {{ permit.load_make_model|default:"-" }}</p>
                     </div>
                     <div class="col-md-4">
-                        <p><strong>Height:</strong> {{ permit.overall_height_ft }}' {{ permit.overall_height_in }}"</p>
+                        <p><strong>Serial#:</strong> {{ permit.load_serial|default:"-" }}</p>
+                    </div>
+                    <div class="col-md-3">
+                        <p><strong>Cargo Length:</strong> {{ permit.load_length|default:"-" }}</p>
+                    </div>
+                    <div class="col-md-3">
+                        <p><strong>Cargo Width:</strong> {{ permit.load_width|default:"-" }}</p>
+                    </div>
+                    <div class="col-md-3">
+                        <p><strong>Cargo Height:</strong> {{ permit.load_height|default:"-" }}</p>
+                    </div>
+                    <div class="col-md-3">
+                        <p><strong>Cargo Weight:</strong> {{ permit.load_weight|default:"-" }} lbs</p>
+                    </div>
+                </div>
+                {% if permit.load_detailed_description %}
+                <div class="row g-3 mt-2">
+                    <div class="col-12">
+                        <p><strong>Detailed Description:</strong> {{ permit.load_detailed_description }}</p>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <hr>
+                
+                <h6 class="mb-3">Overall Dimensions</h6>
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <p><strong>Length:</strong> {{ permit.overall_length_ft|default:0 }}' {{ permit.overall_length_in|default:0 }}"</p>
+                    </div>
+                    <div class="col-md-4">
+                        <p><strong>Width:</strong> {{ permit.overall_width_ft|default:0 }}' {{ permit.overall_width_in|default:0 }}"</p>
+                    </div>
+                    <div class="col-md-4">
+                        <p><strong>Height:</strong> {{ permit.overall_height_ft|default:0 }}' {{ permit.overall_height_in|default:0 }}"</p>
                     </div>
                     <div class="col-md-4">
                         <p><strong>Gross Weight:</strong> {{ permit.gross_weight|default:0 }} lbs</p>
                     </div>
                     <div class="col-md-4">
-                        <p><strong>Axles:</strong> {{ permit.num_axles }}</p>
+                        <p><strong># of Axles:</strong> {{ permit.num_axles|default:0 }}</p>
                     </div>
                     <div class="col-md-4">
                         <p><strong>Legal Weight:</strong> {% if permit.is_legal_weight %}Yes{% else %}No{% endif %}</p>
                     </div>
+                </div>
+                
+                <hr>
+                
+                <h6 class="mb-3">Overhang</h6>
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <p><strong>Front:</strong> {{ permit.front_overhang_ft|default:0 }}' {{ permit.front_overhang_in|default:0 }}"</p>
+                    </div>
+                    <div class="col-md-3">
+                        <p><strong>Rear:</strong> {{ permit.rear_overhang_ft|default:0 }}' {{ permit.rear_overhang_in|default:0 }}"</p>
+                    </div>
+                    <div class="col-md-3">
+                        <p><strong>Left:</strong> {{ permit.left_overhang_ft|default:0 }}' {{ permit.left_overhang_in|default:0 }}"</p>
+                    </div>
+                    <div class="col-md-3">
+                        <p><strong>Right:</strong> {{ permit.right_overhang_ft|default:0 }}' {{ permit.right_overhang_in|default:0 }}"</p>
+                    </div>
+                    <div class="col-md-4">
+                        <p><strong>Kingpin to Rear Axle:</strong> {{ permit.kingpin_to_rear_ft|default:0 }}' {{ permit.kingpin_to_rear_in|default:0 }}"</p>
+                    </div>
+                </div>
+                
+                <hr>
+                
+                <h6 class="mb-3">Axle Configuration</h6>
+                <div class="table-responsive">
+                    <table class="table table-sm table-bordered">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Axle</th>
+                                <th>1</th>
+                                <th>2</th>
+                                <th>3</th>
+                                <th>4</th>
+                                <th>5</th>
+                                <th>6</th>
+                                <th>7</th>
+                                <th>8</th>
+                                <th>9</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Weight (lbs)</strong></td>
+                                <td>{{ permit.axle_weight_1|default:"-" }}</td>
+                                <td>{{ permit.axle_weight_2|default:"-" }}</td>
+                                <td>{{ permit.axle_weight_3|default:"-" }}</td>
+                                <td>{{ permit.axle_weight_4|default:"-" }}</td>
+                                <td>{{ permit.axle_weight_5|default:"-" }}</td>
+                                <td>{{ permit.axle_weight_6|default:"-" }}</td>
+                                <td>{{ permit.axle_weight_7|default:"-" }}</td>
+                                <td>{{ permit.axle_weight_8|default:"-" }}</td>
+                                <td>{{ permit.axle_weight_9|default:"-" }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Tires</strong></td>
+                                <td>{{ permit.tires_per_axle_1|default:"-" }}</td>
+                                <td>{{ permit.tires_per_axle_2|default:"-" }}</td>
+                                <td>{{ permit.tires_per_axle_3|default:"-" }}</td>
+                                <td>{{ permit.tires_per_axle_4|default:"-" }}</td>
+                                <td>{{ permit.tires_per_axle_5|default:"-" }}</td>
+                                <td>{{ permit.tires_per_axle_6|default:"-" }}</td>
+                                <td>{{ permit.tires_per_axle_7|default:"-" }}</td>
+                                <td>{{ permit.tires_per_axle_8|default:"-" }}</td>
+                                <td>{{ permit.tires_per_axle_9|default:"-" }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <h6 class="mb-3 mt-3">Axle Spacings (ft)</h6>
+                <div class="table-responsive">
+                    <table class="table table-sm table-bordered">
+                        <thead class="table-light">
+                            <tr>
+                                <th>1-2</th>
+                                <th>2-3</th>
+                                <th>3-4</th>
+                                <th>4-5</th>
+                                <th>5-6</th>
+                                <th>6-7</th>
+                                <th>7-8</th>
+                                <th>8-9</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>{{ permit.spacing_1_2|default:"-" }}</td>
+                                <td>{{ permit.spacing_2_3|default:"-" }}</td>
+                                <td>{{ permit.spacing_3_4|default:"-" }}</td>
+                                <td>{{ permit.spacing_4_5|default:"-" }}</td>
+                                <td>{{ permit.spacing_5_6|default:"-" }}</td>
+                                <td>{{ permit.spacing_6_7|default:"-" }}</td>
+                                <td>{{ permit.spacing_7_8|default:"-" }}</td>
+                                <td>{{ permit.spacing_8_9|default:"-" }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
