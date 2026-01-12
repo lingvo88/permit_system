@@ -33,7 +33,7 @@
                     <!-- Number of Axles -->
                     <div class="row g-3 mb-4">
                         <div class="col-md-6">
-                            <label class="form-label">Number of Axles</label>
+                            <label class="form-label">Number of Axles *</label>
                             {{ form.num_axles }}
                             {% if form.num_axles.errors %}
                                 <div class="invalid-feedback d-block">{{ form.num_axles.errors }}</div>
@@ -43,30 +43,30 @@
                     
                     <div class="row g-3 mb-4">
                         <div class="col-md-4">
-                            <label class="form-label">Year</label>
+                            <label class="form-label">Year *</label>
                             {{ form.year }}
                         </div>
                         <div class="col-md-8">
-                            <label class="form-label">Make</label>
+                            <label class="form-label">Make *</label>
                             {{ form.make }}
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label">Plate</label>
+                            <label class="form-label">Plate *</label>
                             {{ form.plate }}
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label">State</label>
+                            <label class="form-label">State *</label>
                             {{ form.plate_state }}
                         </div>
                         <div class="col-12">
-                            <label class="form-label">VIN</label>
+                            <label class="form-label">VIN *</label>
                             {{ form.vin }}
                         </div>
                     </div>
                     
                     <div class="row g-3 mb-4">
                         <div class="col-12">
-                            <label class="form-label">Vehicle Length (ft-in)</label>
+                            <label class="form-label">Vehicle Length (ft-in) *</label>
                             <div class="d-flex gap-2 align-items-center">
                                 {{ form.length_ft }}
                                 <span>ft</span>
@@ -87,7 +87,7 @@
                         {% if vehicle and vehicle.registration_pdf %}
                         <small class="text-muted">Current: {{ vehicle.registration_pdf.name }}</small>
                         {% endif %}
-                        <small class="d-block text-muted mt-1">Upload vehicle registration PDF (required)</small>
+                        <small class="d-block text-muted mt-1">Upload vehicle registration PDF (optional)</small>
                     </div>
                     
                     <hr class="my-4">
@@ -137,4 +137,3 @@ fileInput.addEventListener('change', () => {
 });
 </script>
 {% endblock %}
-
