@@ -72,13 +72,13 @@
                         <p><strong>Serial#:</strong> {{ permit.load_serial|default:"-" }}</p>
                     </div>
                     <div class="col-md-3">
-                        <p><strong>Cargo Length:</strong> {{ permit.load_length|default:"-" }}</p>
+                        <p><strong>Cargo Length:</strong> {{ permit.load_length_ft|default:0 }}' {{ permit.load_length_in|default:0 }}"</p>
                     </div>
                     <div class="col-md-3">
-                        <p><strong>Cargo Width:</strong> {{ permit.load_width|default:"-" }}</p>
+                        <p><strong>Cargo Width:</strong> {{ permit.load_width_ft|default:0 }}' {{ permit.load_width_in|default:0 }}"</p>
                     </div>
                     <div class="col-md-3">
-                        <p><strong>Cargo Height:</strong> {{ permit.load_height|default:"-" }}</p>
+                        <p><strong>Cargo Height:</strong> {{ permit.load_height_ft|default:0 }}' {{ permit.load_height_in|default:0 }}"</p>
                     </div>
                     <div class="col-md-3">
                         <p><strong>Cargo Weight:</strong> {{ permit.load_weight|default:"-" }} lbs</p>
@@ -214,6 +214,43 @@
                         </tbody>
                     </table>
                 </div>
+            </div>
+        </div>
+
+        <!-- States -->
+        <div class="card mb-4 fade-in">
+            <div class="card-header">
+                <i class="bi bi-map me-2"></i>States
+            </div>
+            <div class="card-body">
+                {% if permit.states.all %}
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>State</th>
+                                <th>Travel Date</th>
+                                <th>Route</th>
+                                <th>Comments</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for state in permit.states.all %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td><span class="badge bg-primary">{{ state.state }}</span></td>
+                                <td>{{ state.travel_date|date:"m/d/Y"|default:"-" }}</td>
+                                <td>{{ state.route|default:"-" }}</td>
+                                <td>{{ state.comments|default:"-" }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted text-center">No states selected.</p>
+                {% endif %}
             </div>
         </div>
         
