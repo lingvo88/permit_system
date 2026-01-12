@@ -118,6 +118,13 @@ class PermitRequestForm(forms.ModelForm):
     
     def __init__(self, *args, company=None, **kwargs):
         super().__init__(*args, **kwargs)
+
+        self.fields['overall_length_ft'].required = False
+        self.fields['overall_length_in'].required = False
+        self.fields['overall_width_ft'].required = False
+        self.fields['overall_width_in'].required = False
+        self.fields['overall_height_ft'].required = False
+        self.fields['overall_height_in'].required = False
         
         if company:
             # Filter queryset to company's resources
