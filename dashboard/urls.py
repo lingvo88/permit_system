@@ -13,4 +13,6 @@ urlpatterns = [
     path('employee/companies/', views.company_list, name='company_list'),
     path('employee/company/<int:company_id>/', views.company_detail_employee, name='company_detail_employee'),
     path('attachment/<int:attachment_id>/download/', views.download_email_attachment, name='download_email_attachment'),
+    path('archive/', views.permit_archive, name='permit_archive'),
+    path('permit/<int:permit_id>/admin-delete/', views.admin_permit_delete, name='admin_permit_delete'),
 ]

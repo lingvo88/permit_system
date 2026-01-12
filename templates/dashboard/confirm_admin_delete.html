@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block title %}Delete Permit - Admin{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Admin Delete</h1>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body text-center">
+                <i class="bi bi-exclamation-triangle text-danger" style="font-size: 4rem;"></i>
+                <h3 class="mt-3">Permanently Delete Permit #{{ permit.permit_number }}?</h3>
+                <p class="text-muted">This action cannot be undone. All associated data and attachments will be permanently removed.</p>
+                
+                <div class="alert alert-danger">
+                    <strong>Warning:</strong> This is an admin-only action. This permit and all its records will be permanently deleted.
+                </div>
+                
+                <form method="post">
+                    {% csrf_token %}
+                    <a href="{% url 'dashboard:employee_permit_detail' permit.id %}" class="btn btn-secondary me-2">Cancel</a>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-trash me-2"></i>Permanently Delete
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

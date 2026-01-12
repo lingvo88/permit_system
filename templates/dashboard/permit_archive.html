@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+
+{% block title %}Permit Archive - Big Rig Permits{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1><i class="bi bi-archive me-2"></i>Permit Archive</h1>
+    <p class="subtitle">All completed permits - permanent records</p>
+</div>
+
+<a href="{% url 'dashboard:employee_dashboard' %}" class="btn btn-outline-light mb-4">
+    <i class="bi bi-arrow-left me-2"></i>Back to Dashboard
+</a>
+
+<!-- Filters -->
+<div class="card mb-4 fade-in">
+    <div class="card-body">
+        <form method="get" class="row g-3">
+            <div class="col-md-3">
+                <input type="text" name="search" class="form-control" placeholder="Search..." value="{{ search }}">
+            </div>
+            <div class="col-md-2">
+                <select name="company" class="form-select">
+                    <option value="">All Companies</option>
+                    {% for company in companies %}
+                    <option value="{{ company.id }}" {% if company_filter == company.id|stringformat:"i" %}selected{% endif %}>{{ company.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <input type="date" name="date_from" class="form-control" placeholder="From" value="{{ date_from }}">
+            </div>
+            <div class="col-md-2">
+                <input type="date" name="date_to" class="form-control" placeholder="To" value="{{ date_to }}">
+            </div>
+            <div class="col-md-3">
+                <button type="submit" class="btn btn-primary me-2">
+                    <i class="bi bi-search me-1"></i>Filter
+                </button>
+                <a href="{% url 'dashboard:permit_archive' %}" class="btn btn-outline-secondary">Clear</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Permits Table -->
+<div class="card fade-in">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Permit #</th>
+                        <th>Company</th>
+                        <th>Load</th>
+                        <th>States</th>
+                        <th>Completed</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for permit in permits %}
+                    <tr>
+                        <td><strong>#{{ permit.permit_number }}</strong></td>
+                        <td>{{ permit.company.name }}</td>
+                        <td>{{ permit.load_description|truncatechars:30 }}</td>
+                        <td>{{ permit.states_display|default:"-" }}</td>
+                        <td>{{ permit.completed_at|date:"m/d/Y" }}</td>
+                        <td><span class="badge badge-{{ permit.status }}">{{ permit.get_status_display }}</span></td>
+                        <td>
+                            <a href="{% url 'dashboard:employee_permit_detail' permit.id %}" class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-eye"></i> View
+                            </a>
+                            {% if request.user.is_superuser %}
+                            <a href="{% url 'dashboard:admin_permit_delete' permit.id %}" class="btn btn-sm btn-outline-danger">
+                                <i class="bi bi-trash"></i>
+                            </a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center text-muted py-4">No archived permits found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Pagination -->
+        {% if permits.has_other_pages %}
+        <nav class="mt-4">
+            <ul class="pagination justify-content-center">
+                {% if permits.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ permits.previous_page_number }}&search={{ search }}&company={{ company_filter }}&date_from={{ date_from }}&date_to={{ date_to }}">Previous</a>
+                </li>
+                {% endif %}
+                
+                <li class="page-item disabled">
+                    <span class="page-link">Page {{ permits.number }} of {{ permits.paginator.num_pages }}</span>
+                </li>
+                
+                {% if permits.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ permits.next_page_number }}&search={{ search }}&company={{ company_filter }}&date_from={{ date_from }}&date_to={{ date_to }}">Next</a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+    </div>
+</div>
+
+<div class="alert alert-info mt-4">
+    <i class="bi bi-info-circle me-2"></i>
+    <strong>Note:</strong> Archived permits are permanent records and cannot be deleted{% if request.user.is_superuser %} (except by admin){% endif %}. All attachments are preserved for compliance.
+</div>
+{% endblock %}

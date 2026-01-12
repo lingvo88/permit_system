@@ -351,3 +351,72 @@ def download_email_attachment(request, attachment_id):
         as_attachment=True,
         filename=attachment.filename
     )
+@login_required
+def permit_archive(request):
+    """View all completed/archived permits."""
+    
+    if not request.user.is_employee:
+        messages.error(request, 'Access denied.')
+        return redirect('dashboard:index')
+    
+    # Get completed and invoiced permits
+    permits = PermitRequest.objects.filter(
+        status__in=[PermitRequest.Status.COMPLETED, PermitRequest.Status.INVOICED]
+    ).order_by('-completed_at')
+    
+    # Filters
+    search = request.GET.get('search', '')
+    company_id = request.GET.get('company', '')
+    date_from = request.GET.get('date_from', '')
+    date_to = request.GET.get('date_to', '')
+    
+    if search:
+        permits = permits.filter(
+            Q(permit_number__icontains=search) |
+            Q(load_description__icontains=search) |
+            Q(company__name__icontains=search)
+        )
+    
+    if company_id:
+        permits = permits.filter(company_id=company_id)
+    
+    if date_from:
+        permits = permits.filter(completed_at__date__gte=date_from)
+    
+    if date_to:
+        permits = permits.filter(completed_at__date__lte=date_to)
+    
+    # Pagination
+    paginator = Paginator(permits, 20)
+    page = request.GET.get('page', 1)
+    permits = paginator.get_page(page)
+    
+    companies = Company.objects.all()
+    
+    return render(request, 'dashboard/permit_archive.html', {
+        'permits': permits,
+        'companies': companies,
+        'search': search,
+        'company_filter': company_id,
+        'date_from': date_from,
+        'date_to': date_to,
+    })
+
+
+@login_required
+def admin_permit_delete(request, permit_id):
+    """Admin-only permit deletion."""
+    
+    if not request.user.is_superuser:
+        messages.error(request, 'Access denied. Admin only.')
+        return redirect('dashboard:index')
+    
+    permit = get_object_or_404(PermitRequest, pk=permit_id)
+    
+    if request.method == 'POST':
+        permit_number = permit.permit_number
+        permit.delete()
+        messages.success(request, f'Permit #{permit_number} permanently deleted by admin.')
+        return redirect('dashboard:permit_archive')
+    
+    return render(request, 'dashboard/confirm_admin_delete.html', {'permit': permit})
