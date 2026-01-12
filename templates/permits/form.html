@@ -757,7 +757,7 @@ function addStateRow(stateCode = '', date = '', route = '', comments = '') {
                 `<option value="${code}" ${code === stateCode ? 'selected' : ''}>${code}</option>`
             ).join('')}
         </select>
-        <input type="date" name="state_date_${stateCode}" class="form-control form-control-sm" style="width: 140px;" value="${date || ''}" placeholder="Date">
+        <input type="date" name="state_date_${stateCode}" class="form-control form-control-sm" style="width: 140px;" value="${date || ''}" placeholder="Date" min="${new Date().toISOString().split('T')[0]}">
         <input type="text" name="state_route_${stateCode}" class="form-control form-control-sm" style="flex: 1;" value="${route}" placeholder="Route">
         <input type="text" name="state_comments_${stateCode}" class="form-control form-control-sm" style="flex: 1;" value="${comments}" placeholder="Comments">
         <button type="button" class="btn btn-sm btn-outline-danger remove-state"><i class="bi bi-x"></i></button>
