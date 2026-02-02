@@ -131,10 +131,27 @@ input[type=number] {
                 <select id="combinationSelector" class="form-select">
                     <option value="">-- Select a saved combination or choose manually below --</option>
                     {% for combo in combinations %}
-                    <option value="{{ combo.id }}" 
+                    <option value="{{ combo.id }}"
                             data-driver="{{ combo.driver.id }}"
                             data-truck="{{ combo.truck.id|default:'' }}"
                             data-trailer="{{ combo.trailer.id|default:'' }}"
+                            data-num-axles="{{ combo.num_axles|default:'' }}"
+                            data-spacing-1-2-ft="{{ combo.spacing_1_2_ft|default:'' }}"
+                            data-spacing-1-2-in="{{ combo.spacing_1_2_in|default:'' }}"
+                            data-spacing-2-3-ft="{{ combo.spacing_2_3_ft|default:'' }}"
+                            data-spacing-2-3-in="{{ combo.spacing_2_3_in|default:'' }}"
+                            data-spacing-3-4-ft="{{ combo.spacing_3_4_ft|default:'' }}"
+                            data-spacing-3-4-in="{{ combo.spacing_3_4_in|default:'' }}"
+                            data-spacing-4-5-ft="{{ combo.spacing_4_5_ft|default:'' }}"
+                            data-spacing-4-5-in="{{ combo.spacing_4_5_in|default:'' }}"
+                            data-spacing-5-6-ft="{{ combo.spacing_5_6_ft|default:'' }}"
+                            data-spacing-5-6-in="{{ combo.spacing_5_6_in|default:'' }}"
+                            data-spacing-6-7-ft="{{ combo.spacing_6_7_ft|default:'' }}"
+                            data-spacing-6-7-in="{{ combo.spacing_6_7_in|default:'' }}"
+                            data-spacing-7-8-ft="{{ combo.spacing_7_8_ft|default:'' }}"
+                            data-spacing-7-8-in="{{ combo.spacing_7_8_in|default:'' }}"
+                            data-spacing-8-9-ft="{{ combo.spacing_8_9_ft|default:'' }}"
+                            data-spacing-8-9-in="{{ combo.spacing_8_9_in|default:'' }}"
                             {% if combo.is_default %}selected{% endif %}>
                         {{ combo.driver.full_name }} - {{ combo.truck.unit_number|default:"No Truck" }} / {{ combo.trailer.unit_number|default:"No Trailer" }}
                     </option>
@@ -344,31 +361,81 @@ input[type=number] {
 
                     <!-- Spacings Section -->
                     <div class="mb-4">
-                        <label class="form-label fw-bold">Spacings</label>
+                        <label class="form-label fw-bold">Spacings (ft / in)</label>
+                        <div class="row g-2 mb-2">
+                            <div class="col-auto">
+                                <label class="form-label small text-muted">1-2</label>
+                                <div class="input-group" style="width: 220px;">
+                                    <input type="number" name="spacing_1_2_ft" class="form-control" placeholder="ft" min="0">
+                                    <span class="input-group-text">ft</span>
+                                    <input type="number" name="spacing_1_2_in" class="form-control" placeholder="in" min="0" max="11">
+                                    <span class="input-group-text">in</span>
+                                </div>
+                            </div>
+                            <div class="col-auto">
+                                <label class="form-label small text-muted">2-3</label>
+                                <div class="input-group" style="width: 220px;">
+                                    <input type="number" name="spacing_2_3_ft" class="form-control" placeholder="ft" min="0">
+                                    <span class="input-group-text">ft</span>
+                                    <input type="number" name="spacing_2_3_in" class="form-control" placeholder="in" min="0" max="11">
+                                    <span class="input-group-text">in</span>
+                                </div>
+                            </div>
+                            <div class="col-auto">
+                                <label class="form-label small text-muted">3-4</label>
+                                <div class="input-group" style="width: 220px;">
+                                    <input type="number" name="spacing_3_4_ft" class="form-control" placeholder="ft" min="0">
+                                    <span class="input-group-text">ft</span>
+                                    <input type="number" name="spacing_3_4_in" class="form-control" placeholder="in" min="0" max="11">
+                                    <span class="input-group-text">in</span>
+                                </div>
+                            </div>
+                            <div class="col-auto">
+                                <label class="form-label small text-muted">4-5</label>
+                                <div class="input-group" style="width: 220px;">
+                                    <input type="number" name="spacing_4_5_ft" class="form-control" placeholder="ft" min="0">
+                                    <span class="input-group-text">ft</span>
+                                    <input type="number" name="spacing_4_5_in" class="form-control" placeholder="in" min="0" max="11">
+                                    <span class="input-group-text">in</span>
+                                </div>
+                            </div>
+                        </div>
                         <div class="row g-2">
-                            <div class="col">
-                                <input type="number" name="spacing_1_2" class="form-control" placeholder="1-2" min="0" step="0.1" style="width: 90px;">
+                            <div class="col-auto">
+                                <label class="form-label small text-muted">5-6</label>
+                                <div class="input-group" style="width: 220px;">
+                                    <input type="number" name="spacing_5_6_ft" class="form-control" placeholder="ft" min="0">
+                                    <span class="input-group-text">ft</span>
+                                    <input type="number" name="spacing_5_6_in" class="form-control" placeholder="in" min="0" max="11">
+                                    <span class="input-group-text">in</span>
+                                </div>
                             </div>
-                            <div class="col">
-                                <input type="number" name="spacing_2_3" class="form-control" placeholder="2-3" min="0" step="0.1" style="width: 90px;">
+                            <div class="col-auto">
+                                <label class="form-label small text-muted">6-7</label>
+                                <div class="input-group" style="width: 220px;">
+                                    <input type="number" name="spacing_6_7_ft" class="form-control" placeholder="ft" min="0">
+                                    <span class="input-group-text">ft</span>
+                                    <input type="number" name="spacing_6_7_in" class="form-control" placeholder="in" min="0" max="11">
+                                    <span class="input-group-text">in</span>
+                                </div>
                             </div>
-                            <div class="col">
-                                <input type="number" name="spacing_3_4" class="form-control" placeholder="3-4" min="0" step="0.1" style="width: 90px;">
+                            <div class="col-auto">
+                                <label class="form-label small text-muted">7-8</label>
+                                <div class="input-group" style="width: 220px;">
+                                    <input type="number" name="spacing_7_8_ft" class="form-control" placeholder="ft" min="0">
+                                    <span class="input-group-text">ft</span>
+                                    <input type="number" name="spacing_7_8_in" class="form-control" placeholder="in" min="0" max="11">
+                                    <span class="input-group-text">in</span>
+                                </div>
                             </div>
-                            <div class="col">
-                                <input type="number" name="spacing_4_5" class="form-control" placeholder="4-5" min="0" step="0.1" style="width: 90px;">
-                            </div>
-                            <div class="col">
-                                <input type="number" name="spacing_5_6" class="form-control" placeholder="5-6" min="0" step="0.1" style="width: 90px;">
-                            </div>
-                            <div class="col">
-                                <input type="number" name="spacing_6_7" class="form-control" placeholder="6-7" min="0" step="0.1" style="width: 90px;">
-                            </div>
-                            <div class="col">
-                                <input type="number" name="spacing_7_8" class="form-control" placeholder="7-8" min="0" step="0.1" style="width: 90px;">
-                            </div>
-                            <div class="col">
-                                <input type="number" name="spacing_8_9" class="form-control" placeholder="8-9" min="0" step="0.1" style="width: 90px;">
+                            <div class="col-auto">
+                                <label class="form-label small text-muted">8-9</label>
+                                <div class="input-group" style="width: 220px;">
+                                    <input type="number" name="spacing_8_9_ft" class="form-control" placeholder="ft" min="0">
+                                    <span class="input-group-text">ft</span>
+                                    <input type="number" name="spacing_8_9_in" class="form-control" placeholder="in" min="0" max="11">
+                                    <span class="input-group-text">in</span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1024,7 +1091,24 @@ if (combinationSelector) {
             const driverId = selectedOption.dataset.driver;
             const truckId = selectedOption.dataset.truck;
             const trailerId = selectedOption.dataset.trailer;
-            
+            const spacing12ft = selectedOption.getAttribute('data-spacing-1-2-ft');
+            const spacing12in = selectedOption.getAttribute('data-spacing-1-2-in');
+            const spacing23ft = selectedOption.getAttribute('data-spacing-2-3-ft');
+            const spacing23in = selectedOption.getAttribute('data-spacing-2-3-in');
+            const spacing34ft = selectedOption.getAttribute('data-spacing-3-4-ft');
+            const spacing34in = selectedOption.getAttribute('data-spacing-3-4-in');
+            const spacing45ft = selectedOption.getAttribute('data-spacing-4-5-ft');
+            const spacing45in = selectedOption.getAttribute('data-spacing-4-5-in');
+            const spacing56ft = selectedOption.getAttribute('data-spacing-5-6-ft');
+            const spacing56in = selectedOption.getAttribute('data-spacing-5-6-in');
+            const spacing67ft = selectedOption.getAttribute('data-spacing-6-7-ft');
+            const spacing67in = selectedOption.getAttribute('data-spacing-6-7-in');
+            const spacing78ft = selectedOption.getAttribute('data-spacing-7-8-ft');
+            const spacing78in = selectedOption.getAttribute('data-spacing-7-8-in');
+            const spacing89ft = selectedOption.getAttribute('data-spacing-8-9-ft');
+            const spacing89in = selectedOption.getAttribute('data-spacing-8-9-in');
+            const numAxles = selectedOption.getAttribute('data-num-axles');
+
             if (driverId) {
                 document.getElementById('id_driver').value = driverId;
                 document.getElementById('id_driver').dispatchEvent(new Event('change'));
@@ -1035,7 +1119,30 @@ if (combinationSelector) {
             if (trailerId) {
                 document.getElementById('id_trailer').value = trailerId;
             }
-        } else {
+            
+            // Auto-fill axle spacings
+            if (numAxles) {
+                const numAxlesInput = document.querySelector('input[name="num_axles"]');
+                if (numAxlesInput) numAxlesInput.value = numAxles;
+            }
+            if (spacing12ft) document.querySelector('input[name="spacing_1_2_ft"]').value = spacing12ft;
+            if (spacing12in) document.querySelector('input[name="spacing_1_2_in"]').value = spacing12in;
+            if (spacing23ft) document.querySelector('input[name="spacing_2_3_ft"]').value = spacing23ft;
+            if (spacing23in) document.querySelector('input[name="spacing_2_3_in"]').value = spacing23in;
+            if (spacing34ft) document.querySelector('input[name="spacing_3_4_ft"]').value = spacing34ft;
+            if (spacing34in) document.querySelector('input[name="spacing_3_4_in"]').value = spacing34in;
+            if (spacing45ft) document.querySelector('input[name="spacing_4_5_ft"]').value = spacing45ft;
+            if (spacing45in) document.querySelector('input[name="spacing_4_5_in"]').value = spacing45in;
+            if (spacing56ft) document.querySelector('input[name="spacing_5_6_ft"]').value = spacing56ft;
+            if (spacing56in) document.querySelector('input[name="spacing_5_6_in"]').value = spacing56in;
+            if (spacing67ft) document.querySelector('input[name="spacing_6_7_ft"]').value = spacing67ft;
+            if (spacing67in) document.querySelector('input[name="spacing_6_7_in"]').value = spacing67in;
+            if (spacing78ft) document.querySelector('input[name="spacing_7_8_ft"]').value = spacing78ft;
+            if (spacing78in) document.querySelector('input[name="spacing_7_8_in"]').value = spacing78in;
+            if (spacing89ft) document.querySelector('input[name="spacing_8_9_ft"]').value = spacing89ft;
+            if (spacing89in) document.querySelector('input[name="spacing_8_9_in"]').value = spacing89in;
+        }
+        else {
             document.getElementById('id_driver').value = '';
             document.getElementById('id_truck').value = '';
             document.getElementById('id_trailer').value = '';

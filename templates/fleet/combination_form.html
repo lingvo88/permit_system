@@ -18,7 +18,7 @@
             <div class="card-body p-4">
                 <form method="post">
                     {% csrf_token %}
-                    
+
                     <div class="mb-3">
                         <label class="form-label">Driver *</label>
                         {{ form.driver }}
@@ -27,7 +27,7 @@
                         {% endif %}
                         <small class="text-muted">Select the driver for this combination</small>
                     </div>
-                    
+
                     <div class="mb-3">
                         <label class="form-label">Truck</label>
                         {{ form.truck }}
@@ -35,7 +35,7 @@
                             <div class="invalid-feedback d-block">{{ form.truck.errors }}</div>
                         {% endif %}
                     </div>
-                    
+
                     <div class="mb-3">
                         <label class="form-label">Trailer</label>
                         {{ form.trailer }}
@@ -43,7 +43,98 @@
                             <div class="invalid-feedback d-block">{{ form.trailer.errors }}</div>
                         {% endif %}
                     </div>
-                    
+
+                    <hr>
+                    <h5 class="mb-3">Axle Spacings (optional)</h5>
+                    <p class="text-muted small">Save typical axle spacings to auto-fill on new permits</p>
+
+                    <div class="mb-3">
+                        <label class="form-label"># of Axles</label>
+                        {{ form.num_axles }}
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Spacings</label>
+                        <div class="row g-2 mb-2">
+                            <div class="col-auto">
+                                <label class="form-label small text-muted">1-2</label>
+                                <div class="input-group" style="width: 150px;">
+                                    {{ form.spacing_1_2_ft }}
+                                    <span class="input-group-text">ft</span>
+                                    {{ form.spacing_1_2_in }}
+                                    <span class="input-group-text">in</span>
+                                </div>
+                            </div>
+                            <div class="col-auto">
+                                <label class="form-label small text-muted">2-3</label>
+                                <div class="input-group" style="width: 150px;">
+                                    {{ form.spacing_2_3_ft }}
+                                    <span class="input-group-text">ft</span>
+                                    {{ form.spacing_2_3_in }}
+                                    <span class="input-group-text">in</span>
+                                </div>
+                            </div>
+                            <div class="col-auto">
+                                <label class="form-label small text-muted">3-4</label>
+                                <div class="input-group" style="width: 150px;">
+                                    {{ form.spacing_3_4_ft }}
+                                    <span class="input-group-text">ft</span>
+                                    {{ form.spacing_3_4_in }}
+                                    <span class="input-group-text">in</span>
+                                </div>
+                            </div>
+                            <div class="col-auto">
+                                <label class="form-label small text-muted">4-5</label>
+                                <div class="input-group" style="width: 150px;">
+                                    {{ form.spacing_4_5_ft }}
+                                    <span class="input-group-text">ft</span>
+                                    {{ form.spacing_4_5_in }}
+                                    <span class="input-group-text">in</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row g-2">
+                            <div class="col-auto">
+                                <label class="form-label small text-muted">5-6</label>
+                                <div class="input-group" style="width: 150px;">
+                                    {{ form.spacing_5_6_ft }}
+                                    <span class="input-group-text">ft</span>
+                                    {{ form.spacing_5_6_in }}
+                                    <span class="input-group-text">in</span>
+                                </div>
+                            </div>
+                            <div class="col-auto">
+                                <label class="form-label small text-muted">6-7</label>
+                                <div class="input-group" style="width: 150px;">
+                                    {{ form.spacing_6_7_ft }}
+                                    <span class="input-group-text">ft</span>
+                                    {{ form.spacing_6_7_in }}
+                                    <span class="input-group-text">in</span>
+                                </div>
+                            </div>
+                            <div class="col-auto">
+                                <label class="form-label small text-muted">7-8</label>
+                                <div class="input-group" style="width: 150px;">
+                                    {{ form.spacing_7_8_ft }}
+                                    <span class="input-group-text">ft</span>
+                                    {{ form.spacing_7_8_in }}
+                                    <span class="input-group-text">in</span>
+                                </div>
+                            </div>
+                            <div class="col-auto">
+                                <label class="form-label small text-muted">8-9</label>
+                                <div class="input-group" style="width: 150px;">
+                                    {{ form.spacing_8_9_ft }}
+                                    <span class="input-group-text">ft</span>
+                                    {{ form.spacing_8_9_in }}
+                                    <span class="input-group-text">in</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr>
+
                     <div class="mb-4">
                         <div class="form-check">
                             {{ form.is_default }}
@@ -53,9 +144,7 @@
                         </div>
                         <small class="text-muted">Default combination will be automatically selected when creating new permits</small>
                     </div>
-                    
-                    <hr>
-                    
+
                     <div class="d-flex justify-content-between">
                         <button type="submit" class="btn btn-success">
                             <i class="bi bi-check-circle me-2"></i>Save Combination

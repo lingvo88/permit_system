@@ -168,6 +168,28 @@ class EquipmentCombination(models.Model):
         limit_choices_to={'vehicle_type': Vehicle.VehicleType.TRAILER}
     )
     is_default = models.BooleanField(default=False, help_text="Use this as default for new permits")
+
+    
+    # Axle spacings (saved for quick auto-fill)
+    num_axles = models.PositiveIntegerField(default=5, blank=True)
+    # Axle spacings in feet and inches
+    spacing_1_2_ft = models.PositiveIntegerField(default=0, blank=True)
+    spacing_1_2_in = models.PositiveIntegerField(default=0, blank=True)
+    spacing_2_3_ft = models.PositiveIntegerField(default=0, blank=True)
+    spacing_2_3_in = models.PositiveIntegerField(default=0, blank=True)
+    spacing_3_4_ft = models.PositiveIntegerField(default=0, blank=True)
+    spacing_3_4_in = models.PositiveIntegerField(default=0, blank=True)
+    spacing_4_5_ft = models.PositiveIntegerField(default=0, blank=True)
+    spacing_4_5_in = models.PositiveIntegerField(default=0, blank=True)
+    spacing_5_6_ft = models.PositiveIntegerField(default=0, blank=True)
+    spacing_5_6_in = models.PositiveIntegerField(default=0, blank=True)
+    spacing_6_7_ft = models.PositiveIntegerField(default=0, blank=True)
+    spacing_6_7_in = models.PositiveIntegerField(default=0, blank=True)
+    spacing_7_8_ft = models.PositiveIntegerField(default=0, blank=True)
+    spacing_7_8_in = models.PositiveIntegerField(default=0, blank=True)
+    spacing_8_9_ft = models.PositiveIntegerField(default=0, blank=True)
+    spacing_8_9_in = models.PositiveIntegerField(default=0, blank=True)
+
     
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

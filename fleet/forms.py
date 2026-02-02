@@ -96,22 +96,46 @@ class DriverForm(forms.ModelForm):
 
 class EquipmentCombinationForm(forms.ModelForm):
     """Form for creating/editing equipment combinations."""
-    
+
     class Meta:
         model = EquipmentCombination
-        fields = ['driver', 'truck', 'trailer', 'is_default']
+        fields = ['driver', 'truck', 'trailer', 'is_default', 'num_axles', 
+                  'spacing_1_2_ft', 'spacing_1_2_in', 
+                  'spacing_2_3_ft', 'spacing_2_3_in',
+                  'spacing_3_4_ft', 'spacing_3_4_in', 
+                  'spacing_4_5_ft', 'spacing_4_5_in',
+                  'spacing_5_6_ft', 'spacing_5_6_in', 
+                  'spacing_6_7_ft', 'spacing_6_7_in',
+                  'spacing_7_8_ft', 'spacing_7_8_in', 
+                  'spacing_8_9_ft', 'spacing_8_9_in']
         widgets = {
             'driver': forms.Select(attrs={'class': 'form-select'}),
             'truck': forms.Select(attrs={'class': 'form-select'}),
             'trailer': forms.Select(attrs={'class': 'form-select'}),
             'is_default': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'num_axles': forms.NumberInput(attrs={'class': 'form-control', 'style': 'width: 100px;'}),
+            'spacing_1_2_ft': forms.NumberInput(attrs={'class': 'form-control', 'style': 'width: 70px;'}),
+            'spacing_1_2_in': forms.NumberInput(attrs={'class': 'form-control', 'style': 'width: 70px;'}),
+            'spacing_2_3_ft': forms.NumberInput(attrs={'class': 'form-control', 'style': 'width: 70px;'}),
+            'spacing_2_3_in': forms.NumberInput(attrs={'class': 'form-control', 'style': 'width: 70px;'}),
+            'spacing_3_4_ft': forms.NumberInput(attrs={'class': 'form-control', 'style': 'width: 70px;'}),
+            'spacing_3_4_in': forms.NumberInput(attrs={'class': 'form-control', 'style': 'width: 70px;'}),
+            'spacing_4_5_ft': forms.NumberInput(attrs={'class': 'form-control', 'style': 'width: 70px;'}),
+            'spacing_4_5_in': forms.NumberInput(attrs={'class': 'form-control', 'style': 'width: 70px;'}),
+            'spacing_5_6_ft': forms.NumberInput(attrs={'class': 'form-control', 'style': 'width: 70px;'}),
+            'spacing_5_6_in': forms.NumberInput(attrs={'class': 'form-control', 'style': 'width: 70px;'}),
+            'spacing_6_7_ft': forms.NumberInput(attrs={'class': 'form-control', 'style': 'width: 70px;'}),
+            'spacing_6_7_in': forms.NumberInput(attrs={'class': 'form-control', 'style': 'width: 70px;'}),
+            'spacing_7_8_ft': forms.NumberInput(attrs={'class': 'form-control', 'style': 'width: 70px;'}),
+            'spacing_7_8_in': forms.NumberInput(attrs={'class': 'form-control', 'style': 'width: 70px;'}),
+            'spacing_8_9_ft': forms.NumberInput(attrs={'class': 'form-control', 'style': 'width: 70px;'}),
+            'spacing_8_9_in': forms.NumberInput(attrs={'class': 'form-control', 'style': 'width: 70px;'}),
         }
-    
+
     def __init__(self, *args, company=None, **kwargs):
         super().__init__(*args, **kwargs)
-        
+
         if company:
-            # Filter queryset to company's resources
             self.fields['driver'].queryset = Driver.objects.filter(company=company, is_active=True)
             self.fields['truck'].queryset = Vehicle.objects.filter(
                 company=company,
