@@ -1,0 +1,308 @@
+{% extends 'base.html' %}
+
+{% block title %}State Dimensions Map - Big Rig Permits{% endblock %}
+
+{% block extra_css %}
+<style>
+    .map-page-wrapper {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .map-subtitle {
+        text-align: center;
+        color: #888;
+        font-size: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    #us-map {
+        position: relative;
+        background: #fff;
+        border-radius: 8px;
+        padding: 1rem;
+    }
+
+    #us-map svg {
+        width: 100%;
+        display: block;
+        margin: 0 auto;
+    }
+
+    .state-path {
+        fill: #d0d0d0;
+        stroke: #fff;
+        stroke-width: 1.5;
+        cursor: pointer;
+        transition: fill 0.12s ease;
+    }
+
+    .state-path:hover {
+        fill: #b2dfdb;
+    }
+
+    .state-abbr-label {
+        pointer-events: none;
+        user-select: none;
+    }
+
+    #mapTooltip {
+        position: fixed;
+        background: #fff;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        padding: 12px 16px;
+        font-size: 13px;
+        line-height: 1.6;
+        pointer-events: none;
+        display: none;
+        z-index: 9999;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        min-width: 200px;
+        color: #333;
+    }
+
+    #mapTooltip .tt-title {
+        font-weight: 700;
+        font-size: 14px;
+        margin-bottom: 6px;
+        padding-bottom: 6px;
+        border-bottom: 1px solid #eee;
+    }
+
+    #mapTooltip .tt-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 20px;
+    }
+
+    #mapTooltip .tt-label {
+        color: #888;
+    }
+
+    #mapTooltip .tt-value {
+        font-weight: 600;
+        text-align: right;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="map-page-wrapper">
+    <div class="page-header">
+        <h1><i class="bi bi-map me-2"></i>Oversize Legal Dimensions by State</h1>
+        <p class="subtitle">Hover over a state to see maximum legal dimensions</p>
+    </div>
+
+    <a href="{% url 'dashboard:customer_dashboard' %}" class="btn btn-outline-light mb-4">
+        <i class="bi bi-arrow-left me-2"></i>Back to Dashboard
+    </a>
+
+    <p class="map-subtitle">Hover over a state to see basic information.</p>
+
+    <div id="us-map"></div>
+    <div id="mapTooltip"></div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="https://d3js.org/topojson.v3.min.js"></script>
+{% verbatim %}
+<script>
+const stateData = {
+    "01": "AL", "02": "AK", "04": "AZ", "05": "AR", "06": "CA",
+    "08": "CO", "09": "CT", "10": "DE", "11": "DC", "12": "FL",
+    "13": "GA", "15": "HI", "16": "ID", "17": "IL", "18": "IN",
+    "19": "IA", "20": "KS", "21": "KY", "22": "LA", "23": "ME",
+    "24": "MD", "25": "MA", "26": "MI", "27": "MN", "28": "MS",
+    "29": "MO", "30": "MT", "31": "NE", "32": "NV", "33": "NH",
+    "34": "NJ", "35": "NM", "36": "NY", "37": "NC", "38": "ND",
+    "39": "OH", "40": "OK", "41": "OR", "42": "PA", "44": "RI",
+    "45": "SC", "46": "SD", "47": "TN", "48": "TX", "49": "UT",
+    "50": "VT", "51": "VA", "53": "WA", "54": "WV", "55": "WI", "56": "WY"
+};
+
+const stateNames = {
+    "AL": "Alabama", "AK": "Alaska", "AZ": "Arizona", "AR": "Arkansas",
+    "CA": "California", "CO": "Colorado", "CT": "Connecticut", "DE": "Delaware",
+    "FL": "Florida", "GA": "Georgia", "HI": "Hawaii", "ID": "Idaho",
+    "IL": "Illinois", "IN": "Indiana", "IA": "Iowa", "KS": "Kansas",
+    "KY": "Kentucky", "LA": "Louisiana", "ME": "Maine", "MD": "Maryland",
+    "MA": "Massachusetts", "MI": "Michigan", "MN": "Minnesota", "MS": "Mississippi",
+    "MO": "Missouri", "MT": "Montana", "NE": "Nebraska", "NV": "Nevada",
+    "NH": "New Hampshire", "NJ": "New Jersey", "NM": "New Mexico", "NY": "New York",
+    "NC": "North Carolina", "ND": "North Dakota", "OH": "Ohio", "OK": "Oklahoma",
+    "OR": "Oregon", "PA": "Pennsylvania", "RI": "Rhode Island", "SC": "South Carolina",
+    "SD": "South Dakota", "TN": "Tennessee", "TX": "Texas", "UT": "Utah",
+    "VT": "Vermont", "VA": "Virginia", "WA": "Washington", "WV": "West Virginia",
+    "WI": "Wisconsin", "WY": "Wyoming", "DC": "Washington DC"
+};
+
+const stateDimensions = {
+    "AL": { width: "8'6\"", height: "13'6\"", length_single: "40'", length_semi: "57'", length_combo: "57'", weight: "80,000 lbs", permit_weight: "150,000 lbs", notes: "Seasonal restrictions may apply" },
+    "AK": { width: "8'6\"", height: "15'", length_single: "40'", length_semi: "53'", length_combo: "75'", weight: "105,500 lbs", permit_weight: "170,000 lbs", notes: "Winter roads allow heavier loads" },
+    "AZ": { width: "8'6\"", height: "14'", length_single: "40'", length_semi: "57'6\"", length_combo: "65'", weight: "80,000 lbs", permit_weight: "150,000 lbs", notes: "Pilot cars required over 12' wide" },
+    "AR": { width: "8'6\"", height: "13'6\"", length_single: "40'", length_semi: "53'", length_combo: "65'", weight: "80,000 lbs", permit_weight: "120,000 lbs", notes: "Restricted routes for oversize" },
+    "CA": { width: "8'6\"", height: "14'", length_single: "40'", length_semi: "53'", length_combo: "65'", weight: "80,000 lbs", permit_weight: "132,000 lbs", notes: "CALTRANS permit required" },
+    "CO": { width: "8'6\"", height: "14'6\"", length_single: "40'", length_semi: "57'", length_combo: "70'", weight: "80,000 lbs", permit_weight: "150,000 lbs", notes: "Mountain routes restricted" },
+    "CT": { width: "8'6\"", height: "13'6\"", length_single: "40'", length_semi: "53'", length_combo: "60'", weight: "80,000 lbs", permit_weight: "120,000 lbs", notes: "Parkways prohibited" },
+    "DE": { width: "8'6\"", height: "13'6\"", length_single: "40'", length_semi: "53'", length_combo: "60'", weight: "80,000 lbs", permit_weight: "120,000 lbs", notes: "Route survey may be required" },
+    "DC": { width: "8'", height: "12'6\"", length_single: "40'", length_semi: "48'", length_combo: "55'", weight: "80,000 lbs", permit_weight: "100,000 lbs", notes: "Very restricted" },
+    "FL": { width: "8'6\"", height: "13'6\"", length_single: "40'", length_semi: "53'", length_combo: "75'", weight: "80,000 lbs", permit_weight: "160,000 lbs", notes: "Turnpike has different limits" },
+    "GA": { width: "8'6\"", height: "13'6\"", length_single: "40'", length_semi: "53'", length_combo: "60'", weight: "80,000 lbs", permit_weight: "150,000 lbs", notes: "Interstates allow 57' trailers" },
+    "HI": { width: "9'", height: "14'", length_single: "40'", length_semi: "53'", length_combo: "65'", weight: "80,000 lbs", permit_weight: "108,000 lbs", notes: "Island-specific permits required" },
+    "ID": { width: "8'6\"", height: "14'", length_single: "45'", length_semi: "53'", length_combo: "75'", weight: "105,500 lbs", permit_weight: "150,000 lbs", notes: "Extra-length combo routes" },
+    "IL": { width: "8'6\"", height: "13'6\"", length_single: "42'", length_semi: "53'", length_combo: "60'", weight: "80,000 lbs", permit_weight: "120,000 lbs", notes: "Class II roads restricted" },
+    "IN": { width: "8'6\"", height: "13'6\"", length_single: "40'", length_semi: "53'", length_combo: "60'", weight: "80,000 lbs", permit_weight: "134,000 lbs", notes: "Overweight permits online" },
+    "IA": { width: "8'6\"", height: "13'6\"", length_single: "40'", length_semi: "53'", length_combo: "70'", weight: "80,000 lbs", permit_weight: "156,000 lbs", notes: "Spring weight restrictions" },
+    "KS": { width: "8'6\"", height: "14'", length_single: "45'", length_semi: "59'6\"", length_combo: "109'", weight: "85,500 lbs", permit_weight: "150,000 lbs", notes: "Long combo permits available" },
+    "KY": { width: "8'6\"", height: "13'6\"", length_single: "40'", length_semi: "53'", length_combo: "65'", weight: "80,000 lbs", permit_weight: "120,000 lbs", notes: "Coal routes allow more" },
+    "LA": { width: "8'6\"", height: "13'6\"", length_single: "40'", length_semi: "59'6\"", length_combo: "70'", weight: "80,000 lbs", permit_weight: "150,000 lbs", notes: "Sugarcane harvest exceptions" },
+    "ME": { width: "8'6\"", height: "13'6\"", length_single: "40'", length_semi: "53'", length_combo: "100'", weight: "100,000 lbs", permit_weight: "150,000 lbs", notes: "Longer combos on designated routes" },
+    "MD": { width: "8'6\"", height: "13'6\"", length_single: "40'", length_semi: "53'", length_combo: "60'", weight: "80,000 lbs", permit_weight: "130,000 lbs", notes: "Hauling permits required" },
+    "MA": { width: "8'6\"", height: "13'6\"", length_single: "40'", length_semi: "53'", length_combo: "60'", weight: "80,000 lbs", permit_weight: "120,000 lbs", notes: "Strict Boston area limits" },
+    "MI": { width: "8'6\"", height: "13'6\"", length_single: "40'", length_semi: "53'", length_combo: "65'", weight: "164,000 lbs", permit_weight: "200,000 lbs", notes: "Highest weight limits in US" },
+    "MN": { width: "8'6\"", height: "13'6\"", length_single: "45'", length_semi: "53'", length_combo: "75'", weight: "80,000 lbs", permit_weight: "145,000 lbs", notes: "10-ton routes available" },
+    "MS": { width: "8'6\"", height: "13'6\"", length_single: "40'", length_semi: "53'", length_combo: "65'", weight: "80,000 lbs", permit_weight: "120,000 lbs", notes: "Standard permits" },
+    "MO": { width: "8'6\"", height: "14'", length_single: "45'", length_semi: "53'", length_combo: "60'", weight: "80,000 lbs", permit_weight: "160,000 lbs", notes: "No triple trailers" },
+    "MT": { width: "8'6\"", height: "14'", length_single: "45'", length_semi: "53'", length_combo: "100'", weight: "80,000 lbs", permit_weight: "160,000 lbs", notes: "Long combo state" },
+    "NE": { width: "8'6\"", height: "14'6\"", length_single: "40'", length_semi: "53'", length_combo: "65'", weight: "80,000 lbs", permit_weight: "150,000 lbs", notes: "Triples allowed" },
+    "NV": { width: "8'6\"", height: "14'", length_single: "40'", length_semi: "53'", length_combo: "105'", weight: "129,000 lbs", permit_weight: "170,000 lbs", notes: "High weight limits on routes" },
+    "NH": { width: "8'6\"", height: "13'6\"", length_single: "40'", length_semi: "53'", length_combo: "60'", weight: "80,000 lbs", permit_weight: "120,000 lbs", notes: "Covered bridges restricted" },
+    "NJ": { width: "8'6\"", height: "13'6\"", length_single: "40'", length_semi: "53'", length_combo: "65'", weight: "80,000 lbs", permit_weight: "120,000 lbs", notes: "Turnpike different limits" },
+    "NM": { width: "8'6\"", height: "14'", length_single: "40'", length_semi: "57'6\"", length_combo: "65'", weight: "86,400 lbs", permit_weight: "150,000 lbs", notes: "Higher base weight" },
+    "NY": { width: "8'6\"", height: "13'6\"", length_single: "40'", length_semi: "53'", length_combo: "65'", weight: "80,000 lbs", permit_weight: "120,000 lbs", notes: "NYC requires special permit" },
+    "NC": { width: "8'6\"", height: "13'6\"", length_single: "40'", length_semi: "53'", length_combo: "60'", weight: "80,000 lbs", permit_weight: "132,000 lbs", notes: "Furniture routes available" },
+    "ND": { width: "8'6\"", height: "14'", length_single: "40'", length_semi: "53'", length_combo: "75'", weight: "105,500 lbs", permit_weight: "160,000 lbs", notes: "Higher spring weights" },
+    "OH": { width: "8'6\"", height: "13'6\"", length_single: "40'", length_semi: "53'", length_combo: "65'", weight: "80,000 lbs", permit_weight: "120,000 lbs", notes: "Turnpike allows more" },
+    "OK": { width: "8'6\"", height: "13'6\"", length_single: "40'", length_semi: "59'6\"", length_combo: "65'", weight: "90,000 lbs", permit_weight: "150,000 lbs", notes: "Higher base allowed" },
+    "OR": { width: "8'6\"", height: "14'", length_single: "40'", length_semi: "53'", length_combo: "105'", weight: "105,500 lbs", permit_weight: "150,000 lbs", notes: "Long combo routes" },
+    "PA": { width: "8'6\"", height: "13'6\"", length_single: "40'", length_semi: "53'", length_combo: "60'", weight: "80,000 lbs", permit_weight: "120,000 lbs", notes: "Turnpike different" },
+    "RI": { width: "8'6\"", height: "13'6\"", length_single: "40'", length_semi: "53'", length_combo: "60'", weight: "80,000 lbs", permit_weight: "120,000 lbs", notes: "Small state, few routes" },
+    "SC": { width: "8'6\"", height: "13'6\"", length_single: "40'", length_semi: "53'", length_combo: "60'", weight: "80,000 lbs", permit_weight: "132,000 lbs", notes: "Port routes available" },
+    "SD": { width: "8'6\"", height: "14'", length_single: "45'", length_semi: "53'", length_combo: "100'", weight: "80,000 lbs", permit_weight: "150,000 lbs", notes: "Long combo state" },
+    "TN": { width: "8'6\"", height: "13'6\"", length_single: "40'", length_semi: "53'", length_combo: "65'", weight: "80,000 lbs", permit_weight: "120,000 lbs", notes: "Standard limits" },
+    "TX": { width: "8'6\"", height: "14'", length_single: "45'", length_semi: "59'", length_combo: "65'", weight: "80,000 lbs", permit_weight: "200,000 lbs", notes: "Oil field permits available" },
+    "UT": { width: "8'6\"", height: "14'", length_single: "45'", length_semi: "53'", length_combo: "105'", weight: "80,000 lbs", permit_weight: "150,000 lbs", notes: "Long combo routes" },
+    "VT": { width: "8'6\"", height: "13'6\"", length_single: "40'", length_semi: "53'", length_combo: "68'", weight: "80,000 lbs", permit_weight: "120,000 lbs", notes: "Covered bridges restricted" },
+    "VA": { width: "8'6\"", height: "13'6\"", length_single: "40'", length_semi: "53'", length_combo: "65'", weight: "80,000 lbs", permit_weight: "115,000 lbs", notes: "Coal routes available" },
+    "WA": { width: "8'6\"", height: "14'", length_single: "40'", length_semi: "53'", length_combo: "68'", weight: "105,500 lbs", permit_weight: "150,000 lbs", notes: "Higher base weights" },
+    "WV": { width: "8'6\"", height: "13'6\"", length_single: "40'", length_semi: "53'", length_combo: "65'", weight: "80,000 lbs", permit_weight: "120,000 lbs", notes: "Mountain restrictions" },
+    "WI": { width: "8'6\"", height: "13'6\"", length_single: "40'", length_semi: "53'", length_combo: "65'", weight: "80,000 lbs", permit_weight: "150,000 lbs", notes: "Seasonal restrictions" },
+    "WY": { width: "8'6\"", height: "14'", length_single: "60'", length_semi: "60'", length_combo: "85'", weight: "117,000 lbs", permit_weight: "160,000 lbs", notes: "High limits on routes" }
+};
+
+const tooltip = document.getElementById('mapTooltip');
+
+d3.json("https://cdn.jsdelivr.net/npm/us-atlas@3/states-albers-10m.json").then(function(us) {
+    const width = 975;
+    const height = 610;
+
+    const svg = d3.select("#us-map")
+        .append("svg")
+        .attr("viewBox", [0, 0, width, height])
+        .attr("width", "100%")
+        .attr("height", "100%")
+        .style("display", "block")
+        .style("margin", "0 auto");
+
+    const path = d3.geoPath();
+
+    // State fill group
+    const statesGroup = svg.append("g").attr("class", "states-group");
+
+    // Label group on top
+    const stateLabelsGroup = svg.append("g").attr("class", "state-labels-group");
+
+    // Draw states
+    statesGroup.selectAll("path")
+        .data(topojson.feature(us, us.objects.states).features)
+        .enter()
+        .append("path")
+        .attr("d", path)
+        .attr("data-state", d => stateData[d.id] || "")
+        .attr("data-id", d => d.id)
+        .attr("class", "state-path")
+        .on("mouseover", function(event, d) {
+            const code = stateData[d.id];
+            if (!code) return;
+            const s = stateDimensions[code];
+            const name = stateNames[code];
+            if (!s) return;
+
+            d3.select(this).attr("fill", "#b2dfdb");
+
+            tooltip.innerHTML =
+                '<div class="tt-title">State: ' + name + '</div>' +
+                '<div class="tt-row"><span class="tt-label">Width:</span><span class="tt-value">' + s.width + '</span></div>' +
+                '<div class="tt-row"><span class="tt-label">Height:</span><span class="tt-value">' + s.height + '</span></div>' +
+                '<div class="tt-row"><span class="tt-label">Single Unit:</span><span class="tt-value">' + s.length_single + '</span></div>' +
+                '<div class="tt-row"><span class="tt-label">Semi-Trailer:</span><span class="tt-value">' + s.length_semi + '</span></div>' +
+                '<div class="tt-row"><span class="tt-label">Combination:</span><span class="tt-value">' + s.length_combo + '</span></div>' +
+                '<div class="tt-row"><span class="tt-label">Legal Weight:</span><span class="tt-value">' + s.weight + '</span></div>' +
+                '<div class="tt-row"><span class="tt-label">Max Permit:</span><span class="tt-value">' + s.permit_weight + '</span></div>';
+            tooltip.style.display = 'block';
+
+            // Position tooltip
+            tooltip.style.left = (event.clientX + 15) + 'px';
+            tooltip.style.top = (event.clientY - 10) + 'px';
+        })
+        .on("mousemove", function(event) {
+            // Keep tooltip near cursor
+            var x = event.clientX + 15;
+            var y = event.clientY - 10;
+
+            // Prevent going off right edge
+            if (x + 250 > window.innerWidth) {
+                x = event.clientX - 260;
+            }
+            // Prevent going off bottom
+            if (y + 250 > window.innerHeight) {
+                y = event.clientY - 260;
+            }
+
+            tooltip.style.left = x + 'px';
+            tooltip.style.top = y + 'px';
+        })
+        .on("mouseout", function(event, d) {
+            d3.select(this).attr("fill", null);
+            tooltip.style.display = 'none';
+        });
+
+    // State borders
+    svg.append("path")
+        .datum(topojson.mesh(us, us.objects.states, (a, b) => a !== b))
+        .attr("fill", "none")
+        .attr("stroke", "#fff")
+        .attr("stroke-width", 1.5)
+        .attr("stroke-linejoin", "round")
+        .attr("pointer-events", "none")
+        .attr("d", path);
+
+    // State abbreviation labels
+    topojson.feature(us, us.objects.states).features.forEach(function(feature) {
+        const code = stateData[feature.id];
+        if (!code) return;
+        const centroid = path.centroid(feature);
+        if (isNaN(centroid[0]) || isNaN(centroid[1])) return;
+
+        stateLabelsGroup.append("text")
+            .attr("x", centroid[0])
+            .attr("y", centroid[1])
+            .attr("text-anchor", "middle")
+            .attr("dominant-baseline", "central")
+            .attr("font-size", "10px")
+            .attr("font-weight", "600")
+            .attr("fill", "#555")
+            .attr("class", "state-abbr-label")
+            .text(code);
+    });
+
+}).catch(function(error) {
+    console.error("Error loading map:", error);
+    document.getElementById("us-map").innerHTML = '<p class="text-danger text-center">Map could not be loaded.</p>';
+});
+</script>
+{% endverbatim %}
+{% endblock %}

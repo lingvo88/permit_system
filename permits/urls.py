@@ -11,5 +11,6 @@ urlpatterns = [
     path('<int:permit_id>/copy/', views.permit_copy, name='copy'),
     path('<int:permit_id>/delete/', views.permit_delete, name='delete'),
     path('document/<int:document_id>/download/', views.permit_document_download, name='document_download'),
+    path('dimensions-map/', views.dimensions_map, name='dimensions_map'),
 ]
 

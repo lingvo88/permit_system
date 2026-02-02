@@ -336,3 +336,6 @@ def permit_document_download(request, document_id):
         filename=document.filename
     )
 
+@login_required
+def dimensions_map(request):
+    return render(request, 'permits/dimensions_map.html')
