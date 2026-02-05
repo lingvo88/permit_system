@@ -107,7 +107,8 @@ class EquipmentCombinationForm(forms.ModelForm):
                   'spacing_5_6_ft', 'spacing_5_6_in', 
                   'spacing_6_7_ft', 'spacing_6_7_in',
                   'spacing_7_8_ft', 'spacing_7_8_in', 
-                  'spacing_8_9_ft', 'spacing_8_9_in']
+                  'spacing_8_9_ft', 'spacing_8_9_in',
+                  'kingpin_to_rear_axle_ft', 'kingpin_to_rear_axle_in']
         widgets = {
             'driver': forms.Select(attrs={'class': 'form-select'}),
             'truck': forms.Select(attrs={'class': 'form-select'}),
@@ -130,6 +131,8 @@ class EquipmentCombinationForm(forms.ModelForm):
             'spacing_7_8_in': forms.NumberInput(attrs={'class': 'form-control', 'style': 'width: 70px;'}),
             'spacing_8_9_ft': forms.NumberInput(attrs={'class': 'form-control', 'style': 'width: 70px;'}),
             'spacing_8_9_in': forms.NumberInput(attrs={'class': 'form-control', 'style': 'width: 70px;'}),
+            'kingpin_to_rear_axle_ft': forms.NumberInput(attrs={'class': 'form-control', 'style': 'width: 70px;'}),
+            'kingpin_to_rear_axle_in': forms.NumberInput(attrs={'class': 'form-control', 'style': 'width: 70px;'}),
         }
 
     def __init__(self, *args, company=None, **kwargs):

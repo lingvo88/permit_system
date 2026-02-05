@@ -96,10 +96,16 @@ def permit_create(request):
                 tires_val = request.POST.get(f'tires_per_axle_{i}', '') or 0
                 setattr(permit, f'tires_per_axle_{i}', int(tires_val) if tires_val else 0)
 
-            # Handle spacings
+            # Handle spacings (ft/in from form, convert to total inches for storage)
             for spacing in ['1_2', '2_3', '3_4', '4_5', '5_6', '6_7', '7_8', '8_9']:
-                spacing_val = request.POST.get(f'spacing_{spacing}', '') or 0
-                setattr(permit, f'spacing_{spacing}', float(spacing_val) if spacing_val else 0)
+                ft_val = int(request.POST.get(f'spacing_{spacing}_ft', 0) or 0)
+                in_val = int(request.POST.get(f'spacing_{spacing}_in', 0) or 0)
+                total_inches = (ft_val * 12) + in_val
+                setattr(permit, f'spacing_{spacing}', total_inches)
+
+            # Handle kingpin to rear axle
+            permit.kingpin_to_rear_ft = int(request.POST.get('kingpin_to_rear_ft', 0) or 0)
+            permit.kingpin_to_rear_in = int(request.POST.get('kingpin_to_rear_in', 0) or 0)
             
             # Set status based on which button was clicked
             if 'draft' in request.POST:

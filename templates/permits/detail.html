@@ -31,8 +31,10 @@
                         <p><strong>Driver Email:</strong> {{ permit.driver.email|default:"-" }}</p>
                         <p><strong>Truck:</strong> {{ permit.truck|default:"-" }}</p>
                         <p><strong>Truck VIN:</strong> {{ permit.truck.vin|default:"-" }}</p>
+                        <p><strong>Truck Plate:</strong> {% if permit.truck.plate %}{{ permit.truck.plate }} ({{ permit.truck.plate_state }}){% else %}-{% endif %}</p>
                         <p><strong>Trailer:</strong> {{ permit.trailer|default:"-" }}</p>
                         <p><strong>Trailer VIN:</strong> {{ permit.trailer.vin|default:"-" }}</p>
+                        <p><strong>Trailer Plate:</strong> {% if permit.trailer.plate %}{{ permit.trailer.plate }} ({{ permit.trailer.plate_state }}){% else %}-{% endif %}</p>
                     </div>
                 </div>
                 

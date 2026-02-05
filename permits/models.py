@@ -138,6 +138,7 @@ class PermitRequest(models.Model):
     spacing_6_7 = models.DecimalField(max_digits=5, decimal_places=1, default=0, blank=True, verbose_name="Spacing 6-7")
     spacing_7_8 = models.DecimalField(max_digits=5, decimal_places=1, default=0, blank=True, verbose_name="Spacing 7-8")
     spacing_8_9 = models.DecimalField(max_digits=5, decimal_places=1, default=0, blank=True, verbose_name="Spacing 8-9")
+
     
     # Payment
     payment_method = models.ForeignKey(

@@ -152,6 +152,12 @@ input[type=number] {
                             data-spacing-7-8-in="{{ combo.spacing_7_8_in|default:'' }}"
                             data-spacing-8-9-ft="{{ combo.spacing_8_9_ft|default:'' }}"
                             data-spacing-8-9-in="{{ combo.spacing_8_9_in|default:'' }}"
+                            data-kingpin-ft="{{ combo.kingpin_to_rear_axle_ft|default:'0' }}"
+                            data-kingpin-in="{{ combo.kingpin_to_rear_axle_in|default:'0' }}"
+                            data-truck-plate="{{ combo.truck.plate|default:'' }}"
+                            data-truck-plate-state="{{ combo.truck.plate_state|default:'' }}"
+                            data-trailer-plate="{{ combo.trailer.plate|default:'' }}"
+                            data-trailer-plate-state="{{ combo.trailer.plate_state|default:'' }}"
                             {% if combo.is_default %}selected{% endif %}>
                         {{ combo.driver.full_name }} - {{ combo.truck.unit_number|default:"No Truck" }} / {{ combo.trailer.unit_number|default:"No Trailer" }}
                     </option>
@@ -1141,6 +1147,12 @@ if (combinationSelector) {
             if (spacing78in) document.querySelector('input[name="spacing_7_8_in"]').value = spacing78in;
             if (spacing89ft) document.querySelector('input[name="spacing_8_9_ft"]').value = spacing89ft;
             if (spacing89in) document.querySelector('input[name="spacing_8_9_in"]').value = spacing89in;
+
+            // Auto-fill kingpin to rear axle
+            const kingpinFt = selectedOption.getAttribute('data-kingpin-ft');
+            const kingpinIn = selectedOption.getAttribute('data-kingpin-in');
+            if (kingpinFt) document.querySelector('input[name="kingpin_to_rear_ft"]').value = kingpinFt;
+            if (kingpinIn) document.querySelector('input[name="kingpin_to_rear_in"]').value = kingpinIn;
         }
         else {
             document.getElementById('id_driver').value = '';

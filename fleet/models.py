@@ -190,6 +190,10 @@ class EquipmentCombination(models.Model):
     spacing_8_9_ft = models.PositiveIntegerField(default=0, blank=True)
     spacing_8_9_in = models.PositiveIntegerField(default=0, blank=True)
 
+    # Kingpin to rear axle spacing
+    kingpin_to_rear_axle_ft = models.PositiveIntegerField(default=0, blank=True)
+    kingpin_to_rear_axle_in = models.PositiveIntegerField(default=0, blank=True)
+
     
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
