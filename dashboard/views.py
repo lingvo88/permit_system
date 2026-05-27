@@ -420,3 +420,44 @@ def admin_permit_delete(request, permit_id):
         return redirect('dashboard:permit_archive')
     
     return render(request, 'dashboard/confirm_admin_delete.html', {'permit': permit})
+
+@login_required
+def get_notifications(request):
+    """API endpoint to get unread notifications for employees."""
+    if not request.user.is_employee:
+        return JsonResponse({'error': 'Access denied'}, status=403)
+    
+    from .models import Notification
+    
+    notifications = Notification.objects.filter(is_read=False).order_by('-created_at')[:20]
+    
+    data = {
+        'count': notifications.count(),
+        'notifications': [
+            {
+                'id': n.id,
+                'type': n.notification_type,
+                'title': n.title,
+                'message': n.message,
+                'permit_id': n.permit_id,
+                'created_at': n.created_at.isoformat(),
+            }
+            for n in notifications
+        ]
+    }
+    return JsonResponse(data)
+
+
+@login_required  
+def mark_notification_read(request, notification_id):
+    """Mark a notification as read."""
+    if not request.user.is_employee:
+        return JsonResponse({'error': 'Access denied'}, status=403)
+    
+    from .models import Notification
+    
+    notification = get_object_or_404(Notification, pk=notification_id)
+    notification.is_read = True
+    notification.save()
+    
+    return JsonResponse({'success': True})

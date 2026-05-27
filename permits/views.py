@@ -133,8 +133,16 @@ def permit_create(request):
                         comments=request.POST.get(comments_key, '')
                     )
             
-            # Send email notification (after save, only for submitted permits)
+            # Send notification (after save, only for submitted permits)
             if 'draft' not in request.POST:
+                # Create notification for admins
+                from dashboard.models import Notification
+                Notification.objects.create(
+                    notification_type=Notification.NotificationType.NEW_PERMIT,
+                    title=f'New Permit from {company.name}',
+                    message=f'New permit submitted by {request.user.get_full_name() or request.user.username}. Load: {permit.load_description}. Route: {permit.origin_address} → {permit.destination_address}',
+                    permit=permit
+                )
                 messages.success(request, 'Permit request submitted successfully!')
             else:
                 messages.success(request, 'Permit saved as draft.')

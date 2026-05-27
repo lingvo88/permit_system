@@ -4,6 +4,8 @@ from . import views
 app_name = 'dashboard'
 
 urlpatterns = [
+    path('api/notifications/', views.get_notifications, name='get_notifications'),
+    path('api/notifications/<int:notification_id>/read/', views.mark_notification_read, name='mark_notification_read'),
     path('', views.index, name='index'),
     path('customer/', views.customer_dashboard, name='customer_dashboard'),
     path('employee/', views.employee_dashboard, name='employee_dashboard'),

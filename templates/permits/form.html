@@ -2,599 +2,542 @@
 
 {% block title %}{{ title }} - Big Rig Permits{% endblock %}
 
+{% block page_title %}New Permit Submission{% endblock %}
+
 {% block extra_css %}
 <style>
-    .us-map-container {
-        background: #f8f9fa;
-        border-radius: 12px;
-        padding: 1.5rem;
+    /* Full width layout */
+    .permit-form {
+        font-size: 0.9375rem;
     }
-
-    .state-btn {
-        display: inline-block;
-        padding: 0.25rem 0.5rem;
-        margin: 0.125rem;
-        border: 1px solid #dee2e6;
-        border-radius: 4px;
+    
+    /* Action bar at top */
+    .action-bar {
         background: white;
-        cursor: pointer;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        margin-bottom: 1rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: sticky;
+        top: 45px;
+        z-index: 50;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    
+    .action-bar .btn {
+        padding: 0.5rem 1.5rem;
+        font-size: 0.9375rem;
+        font-weight: 600;
+    }
+    
+    /* Section cards */
+    .section-card {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 0.75rem;
+    }
+    
+    .section-title {
         font-size: 0.75rem;
-        transition: all 0.15s;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #0284c7;
+        margin-bottom: 0.75rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #e0f2fe;
     }
-
-    .state-btn:hover {
-        border-color: var(--primary);
+    
+    /* Form labels */
+    .form-label {
+        font-size: 0.8125rem;
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 0.25rem;
+        display: block;
     }
-
-    .state-btn.selected {
-        background: var(--primary);
-        color: white;
-        border-color: var(--primary);
+    
+    /* Form controls - larger */
+    .form-control, .form-select {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.9375rem;
+        border-radius: 6px;
+        border: 1px solid #cbd5e1;
     }
-
-    .dimension-group {
+    
+    .form-control:focus, .form-select:focus {
+        border-color: #0284c7;
+        box-shadow: 0 0 0 3px rgba(2,132,199,0.15);
+    }
+    
+    /* Dimension groups */
+    .dim-group {
         display: flex;
         align-items: center;
         gap: 0.25rem;
     }
-
-    .dimension-group input {
-        width: 60px !important;
+    
+    .dim-group input {
+        width: 55px !important;
+        padding: 0.4rem;
+        font-size: 0.9375rem;
+        text-align: center;
     }
-
-    .dimension-group span {
-        color: #6c757d;
-        font-size: 0.875rem;
+    
+    .dim-group span {
+        font-size: 0.75rem;
+        color: #64748b;
+        font-weight: 500;
     }
-
-    .state-row {
-        background: #f8f9fa;
-        border-radius: 8px;
-        padding: 0.75rem;
-        margin-bottom: 0.5rem;
+    
+    /* Axle grid - larger inputs */
+    .axle-grid {
+        display: grid;
+        grid-template-columns: repeat(9, 1fr);
+        gap: 0.375rem;
     }
-
-    /* Hide number input arrows */
-input[type=number]::-webkit-inner-spin-button,
-input[type=number]::-webkit-outer-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-}
-
-input[type=number] {
-    -moz-appearance: textfield;
-    appearance: textfield;
-}
-
-
-    #us-map-svg {
+    
+    .axle-input {
         width: 100%;
-        max-width: 800px;
-        margin: 0 auto;
+        padding: 0.4rem;
+        font-size: 0.875rem;
+        text-align: center;
+        border: 1px solid #cbd5e1;
+        border-radius: 4px;
+    }
+    
+    .axle-input:focus {
+        border-color: #0284c7;
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(2,132,199,0.15);
+    }
+    
+    .axle-label {
+        font-size: 0.625rem;
+        color: #94a3b8;
+        text-align: center;
+        margin-bottom: 0.125rem;
+    }
+    
+    /* Spacing grid */
+    .spacing-grid {
+        display: grid;
+        grid-template-columns: repeat(8, 1fr);
+        gap: 0.5rem;
+    }
+    
+    @media (max-width: 1400px) {
+        .spacing-grid { grid-template-columns: repeat(4, 1fr); }
+    }
+    
+    .spacing-item label {
+        font-size: 0.6875rem;
+        color: #64748b;
+        font-weight: 600;
         display: block;
+        margin-bottom: 0.125rem;
     }
-    #us-map-svg path {
-        fill: #e9ecef;
-        stroke: #fff;
-        stroke-width: 1.5;
+    
+    .spacing-item .input-group {
+        flex-wrap: nowrap;
+    }
+    
+    .spacing-item input {
+        width: 40px !important;
+        min-width: 40px;
+        padding: 0.3rem;
+        font-size: 0.875rem;
+        text-align: center;
+    }
+    
+    .spacing-item .input-group-text {
+        padding: 0.3rem 0.375rem;
+        font-size: 0.6875rem;
+        background: #f1f5f9;
+    }
+    
+    /* State buttons */
+    .state-btn {
+        padding: 0.25rem 0.5rem;
+        margin: 0.125rem;
+        font-size: 0.75rem;
+        font-weight: 500;
+        border: 1px solid #cbd5e1;
+        border-radius: 4px;
+        background: white;
         cursor: pointer;
-        transition: fill 0.2s;
+        transition: all 0.15s;
     }
-    #us-map-svg path:hover {
-        fill: #007bff;
-        opacity: 0.8;
+    
+    .state-btn:hover {
+        border-color: #0284c7;
+        background: #f0f9ff;
     }
-    #us-map-svg path.selected {
-        fill: #28a745;
+    
+    .state-btn.selected {
+        background: #0284c7;
+        color: white;
+        border-color: #0284c7;
     }
+    
+    .state-row {
+        background: #f8fafc;
+        border-radius: 6px;
+        padding: 0.5rem;
+        margin-bottom: 0.375rem;
+    }
+    
+    /* Map */
+    #us-map svg {
+        max-height: 550px;
+    }
+    
     .map-tooltip {
         position: absolute;
-        background: #333;
+        background: #1e293b;
         color: #fff;
-        padding: 8px 12px;
+        padding: 6px 10px;
         border-radius: 4px;
-        font-size: 12px;
+        font-size: 0.75rem;
         pointer-events: none;
         z-index: 1000;
         display: none;
     }
+    
+    /* Hide number spinners */
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+    input[type=number] {
+        -moz-appearance: textfield;
+    }
+    
+    /* Vehicle info display */
+    .vehicle-info {
+        font-size: 0.75rem;
+        color: #64748b;
+        margin-top: 0.25rem;
+    }
+    
+    .vehicle-info strong {
+        color: #374151;
+    }
 </style>
-
-
 {% endblock %}
 
 {% block content %}
-<!-- Company Info Banner -->
-<div class="card mb-4 fade-in" style="background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);">
-    <div class="card-header bg-transparent border-0 text-white text-center">
-        <h5 class="mb-0">Company Information</h5>
-    </div>
-    <div class="card-body text-white">
-        <div class="row">
-            <div class="col-md-6">
-                <p class="mb-1"><strong>Carrier Name:</strong> {{ company.name }}</p>
-                <p class="mb-1"><strong>USDOT:</strong> {{ company.usdot_number }}</p>
-                <p class="mb-1"><strong>FEIN:</strong> {{ company.fein|default:"-" }}</p>
-                <p class="mb-1"><strong>IFTA:</strong> {{ company.ifta_number|default:"-" }}</p>
-            </div>
-            <div class="col-md-6">
-                <p class="mb-1"><strong>Address:</strong> {{ company.full_address }}</p>
-                <p class="mb-1"><strong>Phone:</strong> {{ company.phone }}</p>
-                <p class="mb-1"><strong>Company Email:</strong> {{ company.email }}</p>
-            </div>
-        </div>
+<form method="post" id="permitForm" class="permit-form">
+{% csrf_token %}
+<input type="hidden" name="driver" id="hidden_driver" value="">
 
+<!-- Action Bar - Sticky at top -->
+<div class="action-bar">
+    <div class="d-flex align-items-center gap-3">
+        <a href="{% url 'dashboard:customer_dashboard' %}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-1"></i> Back
+        </a>
+        <span class="text-muted">|</span>
+        <span class="fw-semibold">{{ company.name }}</span>
+        <span class="text-muted">USDOT: {{ company.usdot_number }}</span>
+    </div>
+    <div class="d-flex gap-2">
+        <button type="submit" name="draft" class="btn btn-primary">
+            <i class="bi bi-save me-1"></i> Save Draft
+        </button>
+        <button type="submit" name="submit" class="btn btn-success">
+            <i class="bi bi-send me-1"></i> Submit Permit
+        </button>
+    </div>
+</div>
+
+<!-- Equipment Selection -->
+<div class="section-card">
+    <div class="row g-3">
         {% if combinations %}
-        <div class="row mt-3 pt-3 border-top border-light">
-            <div class="col-12 mb-3">
-                <label class="form-label text-white-50">Quick Select Equipment Combination</label>
-                <select id="combinationSelector" class="form-select">
-                    <option value="">-- Select a saved combination or choose manually below --</option>
-                    {% for combo in combinations %}
-                    <option value="{{ combo.id }}"
-                            data-driver="{{ combo.driver.id }}"
-                            data-truck="{{ combo.truck.id|default:'' }}"
-                            data-trailer="{{ combo.trailer.id|default:'' }}"
-                            data-num-axles="{{ combo.num_axles|default:'' }}"
-                            data-spacing-1-2-ft="{{ combo.spacing_1_2_ft|default:'' }}"
-                            data-spacing-1-2-in="{{ combo.spacing_1_2_in|default:'' }}"
-                            data-spacing-2-3-ft="{{ combo.spacing_2_3_ft|default:'' }}"
-                            data-spacing-2-3-in="{{ combo.spacing_2_3_in|default:'' }}"
-                            data-spacing-3-4-ft="{{ combo.spacing_3_4_ft|default:'' }}"
-                            data-spacing-3-4-in="{{ combo.spacing_3_4_in|default:'' }}"
-                            data-spacing-4-5-ft="{{ combo.spacing_4_5_ft|default:'' }}"
-                            data-spacing-4-5-in="{{ combo.spacing_4_5_in|default:'' }}"
-                            data-spacing-5-6-ft="{{ combo.spacing_5_6_ft|default:'' }}"
-                            data-spacing-5-6-in="{{ combo.spacing_5_6_in|default:'' }}"
-                            data-spacing-6-7-ft="{{ combo.spacing_6_7_ft|default:'' }}"
-                            data-spacing-6-7-in="{{ combo.spacing_6_7_in|default:'' }}"
-                            data-spacing-7-8-ft="{{ combo.spacing_7_8_ft|default:'' }}"
-                            data-spacing-7-8-in="{{ combo.spacing_7_8_in|default:'' }}"
-                            data-spacing-8-9-ft="{{ combo.spacing_8_9_ft|default:'' }}"
-                            data-spacing-8-9-in="{{ combo.spacing_8_9_in|default:'' }}"
-                            data-kingpin-ft="{{ combo.kingpin_to_rear_axle_ft|default:'0' }}"
-                            data-kingpin-in="{{ combo.kingpin_to_rear_axle_in|default:'0' }}"
-                            data-truck-plate="{{ combo.truck.plate|default:'' }}"
-                            data-truck-plate-state="{{ combo.truck.plate_state|default:'' }}"
-                            data-trailer-plate="{{ combo.trailer.plate|default:'' }}"
-                            data-trailer-plate-state="{{ combo.trailer.plate_state|default:'' }}"
-                            {% if combo.is_default %}selected{% endif %}>
-                        {{ combo.driver.full_name }} - {{ combo.truck.unit_number|default:"No Truck" }} / {{ combo.trailer.unit_number|default:"No Trailer" }}
-                    </option>
-                    {% endfor %}
-                </select>
-            </div>
+        <div class="col-lg-3 col-md-6">
+            <label class="form-label">Quick Select Combination</label>
+            <select id="combinationSelector" class="form-select">
+                <option value="">-- Select saved combination --</option>
+                {% for combo in combinations %}
+                <option value="{{ combo.id }}"
+                        data-driver="{{ combo.driver.id }}"
+                        data-driver-name="{{ combo.driver.full_name }}"
+                        data-driver-email="{{ combo.driver.email|default:'-' }}"
+                        data-driver-phone="{{ combo.driver.phone|default:'-' }}"
+                        data-truck="{{ combo.truck.id|default:'' }}"
+                        data-truck-unit="{{ combo.truck.unit_number|default:'' }}"
+                        data-truck-year="{{ combo.truck.year|default:'' }}"
+                        data-truck-make="{{ combo.truck.make|default:'' }}"
+                        data-truck-plate="{{ combo.truck.plate|default:'' }}"
+                        data-truck-plate-state="{{ combo.truck.plate_state|default:'' }}"
+                        data-trailer="{{ combo.trailer.id|default:'' }}"
+                        data-trailer-unit="{{ combo.trailer.unit_number|default:'' }}"
+                        data-trailer-year="{{ combo.trailer.year|default:'' }}"
+                        data-trailer-make="{{ combo.trailer.make|default:'' }}"
+                        data-trailer-plate="{{ combo.trailer.plate|default:'' }}"
+                        data-trailer-plate-state="{{ combo.trailer.plate_state|default:'' }}"
+                        data-num-axles="{{ combo.num_axles|default:'' }}"
+                        data-spacing-1-2-ft="{{ combo.spacing_1_2_ft|default:'' }}"
+                        data-spacing-1-2-in="{{ combo.spacing_1_2_in|default:'' }}"
+                        data-spacing-2-3-ft="{{ combo.spacing_2_3_ft|default:'' }}"
+                        data-spacing-2-3-in="{{ combo.spacing_2_3_in|default:'' }}"
+                        data-spacing-3-4-ft="{{ combo.spacing_3_4_ft|default:'' }}"
+                        data-spacing-3-4-in="{{ combo.spacing_3_4_in|default:'' }}"
+                        data-spacing-4-5-ft="{{ combo.spacing_4_5_ft|default:'' }}"
+                        data-spacing-4-5-in="{{ combo.spacing_4_5_in|default:'' }}"
+                        data-spacing-5-6-ft="{{ combo.spacing_5_6_ft|default:'' }}"
+                        data-spacing-5-6-in="{{ combo.spacing_5_6_in|default:'' }}"
+                        data-spacing-6-7-ft="{{ combo.spacing_6_7_ft|default:'' }}"
+                        data-spacing-6-7-in="{{ combo.spacing_6_7_in|default:'' }}"
+                        data-spacing-7-8-ft="{{ combo.spacing_7_8_ft|default:'' }}"
+                        data-spacing-7-8-in="{{ combo.spacing_7_8_in|default:'' }}"
+                        data-spacing-8-9-ft="{{ combo.spacing_8_9_ft|default:'' }}"
+                        data-spacing-8-9-in="{{ combo.spacing_8_9_in|default:'' }}"
+                        data-kingpin-ft="{{ combo.kingpin_to_rear_axle_ft|default:'0' }}"
+                        data-kingpin-in="{{ combo.kingpin_to_rear_axle_in|default:'0' }}"
+                        {% if combo.is_default %}selected{% endif %}>
+                    {{ combo.driver.full_name }} - {{ combo.truck.unit_number|default:"No Truck" }} / {{ combo.trailer.unit_number|default:"No Trailer" }}
+                </option>
+                {% endfor %}
+            </select>
         </div>
         {% endif %}
-
-        <div class="row mt-3 {% if not combinations %}pt-3 border-top border-light{% endif %}">
-            <div class="col-md-6">
-                <label class="form-label text-white-50">Driver</label>
-                <select name="driver" id="id_driver" class="form-select">
-                    <option value="">---------</option>
-                    {% for driver in form.driver.field.queryset %}
-                    <option value="{{ driver.id }}" data-email="{{ driver.email|default:'-' }}" {% if form.driver.value|stringformat:"i" == driver.id|stringformat:"i" %}selected{% endif %}>
-                        {{ driver.full_name }}
-                    </option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="col-md-6">
-                <label class="form-label text-white-50">Driver Email</label>
-                <input type="text" class="form-control" id="driverEmail" readonly value="-">
+        <div class="col-lg-3 col-md-6">
+            <label class="form-label">Driver</label>
+            <select name="driver" id="id_driver" class="form-select">
+                <option value="">-- Select --</option>
+                {% for driver in form.driver.field.queryset %}
+                <option value="{{ driver.id }}" 
+                        data-email="{{ driver.email|default:'-' }}"
+                        data-phone="{{ driver.phone|default:'-' }}"
+                        {% if form.driver.value|stringformat:"i" == driver.id|stringformat:"i" %}selected{% endif %}>
+                    {{ driver.full_name }}
+                </option>
+                {% endfor %}
+            </select>
+            <div class="vehicle-info" id="driverInfo">-</div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <label class="form-label">Truck</label>
+            {{ form.truck }}
+            <div class="vehicle-info" id="truckInfo">-</div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <label class="form-label">Trailer</label>
+            {{ form.trailer }}
+            <div class="vehicle-info" id="trailerInfo">-</div>
+        </div>
+    </div>
+</div>
+<!-- Main content - 3 columns -->
+<div class="row g-3">
+    <!-- Column 1: Load Info -->
+    <div class="col-xl-4 col-lg-6">
+        <div class="section-card h-100">
+            <div class="section-title">Load Information</div>
+            <div class="row g-2">
+                <div class="col-12">
+                    <label class="form-label">Cargo Description *</label>
+                    {{ form.load_description }}
+                </div>
+                <div class="col-6">
+                    <label class="form-label">Make/Model</label>
+                    {{ form.load_make_model }}
+                </div>
+                <div class="col-6">
+                    <label class="form-label">Serial #</label>
+                    {{ form.load_serial }}
+                </div>
+                <div class="col-6">
+                    <label class="form-label">Origin Address *</label>
+                    {{ form.origin_address }}
+                </div>
+                <div class="col-6">
+                    <label class="form-label">Destination Address *</label>
+                    {{ form.destination_address }}
+                </div>
+                <div class="col-12">
+                    <label class="form-label">Detailed Description</label>
+                    {{ form.load_detailed_description }}
+                </div>
             </div>
         </div>
-            </div>
-        </div>
-
-<form method="post" id="permitForm">
-    {% csrf_token %}
+    </div>
     
-    <!-- Hidden driver field that gets submitted -->
-    <input type="hidden" name="driver" id="hidden_driver" value="">
-
-    <div class="row g-4">
-        <div class="col-lg-9">
-           <!-- Load Info -->
-<div class="card mb-4 fade-in">
-    <div class="card-body">
-        <div class="row g-3">
-            <div class="col-md-6">
-                <label class="form-label">Truck</label>
-                {{ form.truck }}
-            </div>
-            <div class="col-md-6">
-                <label class="form-label">Trailer</label>
-                {{ form.trailer }}
-            </div>
-        </div>
-        <hr>
-
-        <div class="row g-3">
-            <div class="col-12">
-                <label class="form-label">Cargo *</label>
-                {{ form.load_description }}
-            </div>
-            <div class="col-md-6">
-                <label class="form-label">Make/Model</label>
-                {{ form.load_make_model }}
-            </div>
-            <div class="col-md-6">
-                <label class="form-label">Serial#</label>
-                {{ form.load_serial }}
-            </div>
-        </div>
-
-        <hr>
-
-        <div class="row g-3">
-            <div class="col-md-3">
-                <label class="form-label">Length</label>
-                <div class="dimension-group">
-                    {{ form.load_length_ft }}<span>ft</span>
-                    {{ form.load_length_in }}<span>in</span>
+    <!-- Column 2: Dimensions -->
+    <div class="col-xl-4 col-lg-6">
+        <div class="section-card h-100">
+            <div class="section-title">Load Dimensions</div>
+            <div class="row g-2">
+                <div class="col-6">
+                    <label class="form-label">Length</label>
+                    <div class="dim-group">
+                        {{ form.load_length_ft }}<span>ft</span>
+                        {{ form.load_length_in }}<span>in</span>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <label class="form-label">Width</label>
+                    <div class="dim-group">
+                        {{ form.load_width_ft }}<span>ft</span>
+                        {{ form.load_width_in }}<span>in</span>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <label class="form-label">Height</label>
+                    <div class="dim-group">
+                        {{ form.load_height_ft }}<span>ft</span>
+                        {{ form.load_height_in }}<span>in</span>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <label class="form-label">Load Weight (lbs)</label>
+                    {{ form.load_weight }}
                 </div>
             </div>
-            <div class="col-md-3">
-                <label class="form-label">Width</label>
-                <div class="dimension-group">
-                    {{ form.load_width_ft }}<span>ft</span>
-                    {{ form.load_width_in }}<span>in</span>
+            
+            <div class="section-title mt-3">Overhangs</div>
+            <div class="row g-2">
+                <div class="col-6">
+                    <label class="form-label">Front</label>
+                    <div class="dim-group">{{ form.front_overhang_ft }}<span>ft</span>{{ form.front_overhang_in }}<span>in</span></div>
+                </div>
+                <div class="col-6">
+                    <label class="form-label">Rear</label>
+                    <div class="dim-group">{{ form.rear_overhang_ft }}<span>ft</span>{{ form.rear_overhang_in }}<span>in</span></div>
+                </div>
+                <div class="col-6">
+                    <label class="form-label">Left</label>
+                    <div class="dim-group">{{ form.left_overhang_ft }}<span>ft</span>{{ form.left_overhang_in }}<span>in</span></div>
+                </div>
+                <div class="col-6">
+                    <label class="form-label">Right</label>
+                    <div class="dim-group">{{ form.right_overhang_ft }}<span>ft</span>{{ form.right_overhang_in }}<span>in</span></div>
+                </div>
+                <div class="col-12">
+                    <label class="form-label">Kingpin to Rear Axle</label>
+                    <div class="dim-group">{{ form.kingpin_to_rear_ft }}<span>ft</span>{{ form.kingpin_to_rear_in }}<span>in</span></div>
                 </div>
             </div>
-            <div class="col-md-3">
-                <label class="form-label">Height</label>
-                <div class="dimension-group">
-                    {{ form.load_height_ft }}<span>ft</span>
-                    {{ form.load_height_in }}<span>in</span>
+        </div>
+    </div>
+    
+    <!-- Column 3: Axles -->
+    <div class="col-xl-4 col-lg-12">
+        <div class="section-card h-100">
+            <div class="section-title">Axle Configuration</div>
+            <div class="row g-2 mb-3">
+                <div class="col-4">
+                    <label class="form-label"># of Axles</label>
+                    {{ form.num_axles }}
+                </div>
+                <div class="col-4">
+                    <label class="form-label">Gross Weight (lbs)</label>
+                    <input type="number" id="id_gross_weight" name="gross_weight" class="form-control" placeholder="0" min="0" inputmode="numeric">
+                </div>
+                <div class="col-4 d-flex align-items-end pb-2">
+                    <div class="form-check">
+                        {{ form.is_legal_weight }}
+                        <label class="form-check-label" for="id_is_legal_weight">Legal Weight (80k)</label>
+                    </div>
                 </div>
             </div>
-            <div class="col-md-3">
-                <label class="form-label">Weight (lbs)</label>
-                {{ form.load_weight }}
+            
+            <label class="form-label">Axle Weights (lbs)</label>
+            <div class="axle-grid mb-2">
+                {% for i in "123456789" %}
+                <div>
+                    <div class="axle-label">Ax {{ i }}</div>
+                    <input type="number" name="axle_weight_{{ i }}" class="axle-input" placeholder="lbs" min="0" inputmode="numeric">
+                </div>
+                {% endfor %}
             </div>
-        </div>
-
-        <hr>
-
-        <div class="row g-3">
-            <div class="col-md-6">
-                <label class="form-label">Origin Address *</label>
-                {{ form.origin_address }}
-            </div>
-            <div class="col-md-6">
-                <label class="form-label">Destination Address *</label>
-                {{ form.destination_address }}
-            </div>
-        </div>
-        <hr>
-
-        <div class="row g-3">
-            <div class="col-12">
-                <label class="form-label">Load Description</label>
-                {{ form.load_detailed_description }}
+            
+            <label class="form-label">Tires per Axle</label>
+            <div class="axle-grid">
+                {% for i in "123456789" %}
+                <div>
+                    <div class="axle-label">Ax {{ i }}</div>
+                    <input type="number" name="tires_per_axle_{{ i }}" class="axle-input" placeholder="#" min="0" max="12" inputmode="numeric">
+                </div>
+                {% endfor %}
             </div>
         </div>
     </div>
 </div>
 
-            <!-- Dimensions -->
-            <div class="card mb-4 fade-in">
-                <div class="card-header">
-                    <i class="bi bi-rulers me-2"></i>Dimensions & Configuration
-                </div>
-                <div class="card-body">
-                    <div class="row g-3 mb-4">
-                        <div class="col-md-6">
-                            <label class="form-label"># of Axles</label>
-                            {{ form.num_axles }}
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-check mt-4">
-                                {{ form.is_legal_weight }}
-                                <label class="form-check-label" for="id_is_legal_weight">Legal Weight</label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Axle Weights Section -->
-                    <div class="mb-4">
-                        <label class="form-label fw-bold">Ax-weight</label>
-                        <div class="row g-2">
-                            <div class="col">
-                                <input type="number" name="axle_weight_1" class="form-control" placeholder="ax-1" min="0" style="width: 90px;">
-                            </div>
-                            <div class="col">
-                                <input type="number" name="axle_weight_2" class="form-control" placeholder="ax-2" min="0" style="width: 90px;">
-                            </div>
-                            <div class="col">
-                                <input type="number" name="axle_weight_3" class="form-control" placeholder="ax-3" min="0" style="width: 90px;">
-                            </div>
-                            <div class="col">
-                                <input type="number" name="axle_weight_4" class="form-control" placeholder="ax-4" min="0" style="width: 90px;">
-                            </div>
-                            <div class="col">
-                                <input type="number" name="axle_weight_5" class="form-control" placeholder="ax-5" min="0" style="width: 90px;">
-                            </div>
-                            <div class="col">
-                                <input type="number" name="axle_weight_6" class="form-control" placeholder="ax-6" min="0" style="width: 90px;">
-                            </div>
-                            <div class="col">
-                                <input type="number" name="axle_weight_7" class="form-control" placeholder="ax-7" min="0" style="width: 90px;">
-                            </div>
-                            <div class="col">
-                                <input type="number" name="axle_weight_8" class="form-control" placeholder="ax-8" min="0" style="width: 90px;">
-                            </div>
-                            <div class="col">
-                                <input type="number" name="axle_weight_9" class="form-control" placeholder="ax-9" min="0" style="width: 90px;">
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Tires per Axle Section -->
-                    <div class="mb-4">
-                        <label class="form-label fw-bold">Tires per axle</label>
-                        <div class="row g-2">
-                            <div class="col">
-                                <input type="number" name="tires_per_axle_1" class="form-control" placeholder="ax-1" min="0" style="width: 90px;">
-                            </div>
-                            <div class="col">
-                                <input type="number" name="tires_per_axle_2" class="form-control" placeholder="ax-2" min="0" style="width: 90px;">
-                            </div>
-                            <div class="col">
-                                <input type="number" name="tires_per_axle_3" class="form-control" placeholder="ax-3" min="0" style="width: 90px;">
-                            </div>
-                            <div class="col">
-                                <input type="number" name="tires_per_axle_4" class="form-control" placeholder="ax-4" min="0" style="width: 90px;">
-                            </div>
-                            <div class="col">
-                                <input type="number" name="tires_per_axle_5" class="form-control" placeholder="ax-5" min="0" style="width: 90px;">
-                            </div>
-                            <div class="col">
-                                <input type="number" name="tires_per_axle_6" class="form-control" placeholder="ax-6" min="0" style="width: 90px;">
-                            </div>
-                            <div class="col">
-                                <input type="number" name="tires_per_axle_7" class="form-control" placeholder="ax-7" min="0" style="width: 90px;">
-                            </div>
-                            <div class="col">
-                                <input type="number" name="tires_per_axle_8" class="form-control" placeholder="ax-8" min="0" style="width: 90px;">
-                            </div>
-                            <div class="col">
-                                <input type="number" name="tires_per_axle_9" class="form-control" placeholder="ax-9" min="0" style="width: 90px;">
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Spacings Section -->
-                    <div class="mb-4">
-                        <label class="form-label fw-bold">Spacings (ft / in)</label>
-                        <div class="row g-2 mb-2">
-                            <div class="col-auto">
-                                <label class="form-label small text-muted">1-2</label>
-                                <div class="input-group" style="width: 220px;">
-                                    <input type="number" name="spacing_1_2_ft" class="form-control" placeholder="ft" min="0">
-                                    <span class="input-group-text">ft</span>
-                                    <input type="number" name="spacing_1_2_in" class="form-control" placeholder="in" min="0" max="11">
-                                    <span class="input-group-text">in</span>
-                                </div>
-                            </div>
-                            <div class="col-auto">
-                                <label class="form-label small text-muted">2-3</label>
-                                <div class="input-group" style="width: 220px;">
-                                    <input type="number" name="spacing_2_3_ft" class="form-control" placeholder="ft" min="0">
-                                    <span class="input-group-text">ft</span>
-                                    <input type="number" name="spacing_2_3_in" class="form-control" placeholder="in" min="0" max="11">
-                                    <span class="input-group-text">in</span>
-                                </div>
-                            </div>
-                            <div class="col-auto">
-                                <label class="form-label small text-muted">3-4</label>
-                                <div class="input-group" style="width: 220px;">
-                                    <input type="number" name="spacing_3_4_ft" class="form-control" placeholder="ft" min="0">
-                                    <span class="input-group-text">ft</span>
-                                    <input type="number" name="spacing_3_4_in" class="form-control" placeholder="in" min="0" max="11">
-                                    <span class="input-group-text">in</span>
-                                </div>
-                            </div>
-                            <div class="col-auto">
-                                <label class="form-label small text-muted">4-5</label>
-                                <div class="input-group" style="width: 220px;">
-                                    <input type="number" name="spacing_4_5_ft" class="form-control" placeholder="ft" min="0">
-                                    <span class="input-group-text">ft</span>
-                                    <input type="number" name="spacing_4_5_in" class="form-control" placeholder="in" min="0" max="11">
-                                    <span class="input-group-text">in</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row g-2">
-                            <div class="col-auto">
-                                <label class="form-label small text-muted">5-6</label>
-                                <div class="input-group" style="width: 220px;">
-                                    <input type="number" name="spacing_5_6_ft" class="form-control" placeholder="ft" min="0">
-                                    <span class="input-group-text">ft</span>
-                                    <input type="number" name="spacing_5_6_in" class="form-control" placeholder="in" min="0" max="11">
-                                    <span class="input-group-text">in</span>
-                                </div>
-                            </div>
-                            <div class="col-auto">
-                                <label class="form-label small text-muted">6-7</label>
-                                <div class="input-group" style="width: 220px;">
-                                    <input type="number" name="spacing_6_7_ft" class="form-control" placeholder="ft" min="0">
-                                    <span class="input-group-text">ft</span>
-                                    <input type="number" name="spacing_6_7_in" class="form-control" placeholder="in" min="0" max="11">
-                                    <span class="input-group-text">in</span>
-                                </div>
-                            </div>
-                            <div class="col-auto">
-                                <label class="form-label small text-muted">7-8</label>
-                                <div class="input-group" style="width: 220px;">
-                                    <input type="number" name="spacing_7_8_ft" class="form-control" placeholder="ft" min="0">
-                                    <span class="input-group-text">ft</span>
-                                    <input type="number" name="spacing_7_8_in" class="form-control" placeholder="in" min="0" max="11">
-                                    <span class="input-group-text">in</span>
-                                </div>
-                            </div>
-                            <div class="col-auto">
-                                <label class="form-label small text-muted">8-9</label>
-                                <div class="input-group" style="width: 220px;">
-                                    <input type="number" name="spacing_8_9_ft" class="form-control" placeholder="ft" min="0">
-                                    <span class="input-group-text">ft</span>
-                                    <input type="number" name="spacing_8_9_in" class="form-control" placeholder="in" min="0" max="11">
-                                    <span class="input-group-text">in</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                   <div class="row g-3 mb-3">
-                        <div class="col-md-4">
-                            <label class="form-label">Front Overhang</label>
-                            <div class="dimension-group">
-                                {{ form.front_overhang_ft }}<span>ft</span>
-                                {{ form.front_overhang_in }}<span>in</span>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Rear Overhang</label>
-                            <div class="dimension-group">
-                                {{ form.rear_overhang_ft }}<span>ft</span>
-                                {{ form.rear_overhang_in }}<span>in</span>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Gross Weight *</label>
-                            <div class="d-flex align-items-center gap-2">
-                                <input type="number" id="id_gross_weight" name="gross_weight" class="form-control" placeholder="0" style="width: 150px;">
-                                <span class="text-muted">lbs</span>
-                            </div>
-                            <small class="text-muted">Auto-calculated from axle weights</small>
-                        </div>
-                    </div>
-
-                    <div class="row g-3">
-                        <div class="col-md-4">
-                            <label class="form-label">Left Overhang</label>
-                            <div class="dimension-group">
-                                {{ form.left_overhang_ft }}<span>ft</span>
-                                {{ form.left_overhang_in }}<span>in</span>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Right Overhang</label>
-                            <div class="dimension-group">
-                                {{ form.right_overhang_ft }}<span>ft</span>
-                                {{ form.right_overhang_in }}<span>in</span>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Kingpin to Rear Axle</label>
-                            <div class="dimension-group">
-                                {{ form.kingpin_to_rear_ft }}<span>ft</span>
-                                {{ form.kingpin_to_rear_in }}<span>in</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Interactive Map -->
-            <div class="card mb-4 fade-in">
-                <div class="card-header">
-                    <i class="bi bi-map me-2"></i>Interactive Route Map
-                </div>
-                <div class="card-body">
-                    <p class="text-muted mb-3">
-                        <strong>Click states</strong> to add them in travel order. 
-                        <strong>Click again</strong> to remove. 
-                        <strong>Hover</strong> for permit requirements.
-                    </p>
-                    
-                    <div id="mapContainer" style="position: relative;">
-                        <div id="us-map"></div>
-                        <div class="map-tooltip" id="mapTooltip"></div>
-                    </div>
-                    
-                    <div class="mt-3 d-flex justify-content-between align-items-center">
-                        <button type="button" class="btn btn-sm btn-outline-danger" id="clearMapBtn">
-                            <i class="bi bi-x-circle me-1"></i>Clear Route
-                        </button>
-                        <span class="text-muted">Route: <strong id="routeDisplay">No states selected</strong></span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- State Selection -->
-            <div class="card mb-4 fade-in">
-                <div class="card-header">
-                    <i class="bi bi-map me-2"></i>States Selection
-                </div>
-                <div class="card-body">
-                    <p class="text-muted text-center mb-3">Click on a state to add it to your permit request</p>
-
-                    <div class="us-map-container text-center mb-4">
-                        {% for code, name in state_choices %}
-                        <button type="button" class="state-btn" data-state="{{ code }}" title="{{ name }}">{{ code }}</button>
-                        {% endfor %}
-                    </div>
-
-                    <div id="selectedStates">
-                        <!-- Selected states will appear here -->
-                    </div>
-
-                    <button type="button" class="btn btn-outline-primary btn-sm" id="addStateBtn">
-                        <i class="bi bi-plus-circle me-1"></i>Add State Row
-                    </button>
-                </div>
-            </div>
-
-        
-
-            <!-- Comments -->
-            <div class="card mb-4 fade-in">
-                <div class="card-body">
-                    <label class="form-label">Customer Comments</label>
-                    {{ form.customer_comments }}
-                </div>
+<!-- Axle Spacings -->
+<div class="section-card">
+    <div class="section-title">Axle Spacings</div>
+    <div class="spacing-grid">
+        {% for num in "12345678" %}
+        <div class="spacing-item">
+            <label>Axle {{ num }} to {{ num|add:"1" }}</label>
+            <div class="input-group">
+                <input type="number" name="spacing_{{ num }}_{{ num|add:'1' }}_ft" class="form-control" min="0" inputmode="numeric">
+                <span class="input-group-text">ft</span>
+                <input type="number" name="spacing_{{ num }}_{{ num|add:'1' }}_in" class="form-control" min="0" max="11" inputmode="numeric">
+                <span class="input-group-text">in</span>
             </div>
         </div>
+        {% endfor %}
+    </div>
+</div>
 
-        <!-- Sidebar -->
-        <div class="col-lg-3">
-            <div class="card fade-in sticky-top" style="top: 80px;">
-                <div class="card-header">
-                    <i class="bi bi-check-circle me-2"></i>Submit Permit
-                </div>
-                <div class="card-body">
-                    <p class="text-muted small">
-                        Review your information and submit the permit request for processing.
-                    </p>
-
-                    <div class="d-grid gap-2">
-                        <a href="{% url 'dashboard:customer_dashboard' %}" class="btn btn-outline-secondary">
-                            Back to Dashboard
-                        </a>
-                        <button type="submit" name="draft" class="btn btn-primary">
-                            <i class="bi bi-save me-2"></i>Save as Draft
-                        </button>
-                        <button type="submit" name="submit" class="btn btn-success">
-                            <i class="bi bi-send me-2"></i>Submit
-                        </button>
-                    </div>
-                </div>
+<!-- Route Selection -->
+<div class="row g-3">
+    <div class="col-lg-6">
+        <div class="section-card">
+            <div class="section-title">Route Map</div>
+            <div id="mapContainer" style="position: relative;">
+                <div id="us-map"></div>
+                <div class="map-tooltip" id="mapTooltip"></div>
+            </div>
+            <div class="d-flex justify-content-between align-items-center mt-2">
+                <button type="button" class="btn btn-sm btn-outline-danger" id="clearMapBtn">
+                    <i class="bi bi-x-circle me-1"></i>Clear Route
+                </button>
+                <span>Route: <strong id="routeDisplay">None selected</strong></span>
             </div>
         </div>
     </div>
+    <div class="col-lg-6">
+        <div class="section-card h-100">
+            <div class="section-title">States Selection</div>
+            <div class="mb-3 text-center">
+                {% for code, name in state_choices %}
+                <button type="button" class="state-btn" data-state="{{ code }}" title="{{ name }}">{{ code }}</button>
+                {% endfor %}
+            </div>
+            <div id="selectedStates"></div>
+            <button type="button" class="btn btn-outline-primary btn-sm" id="addStateBtn">
+                <i class="bi bi-plus-circle me-1"></i> Add State Row
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Comments -->
+<div class="section-card">
+    <label class="form-label">Customer Comments</label>
+    {{ form.customer_comments }}
+</div>
+
 </form>
 {% endblock %}
 
 {% block extra_js %}
-
-<!-- D3.js for map rendering -->
 <script src="https://d3js.org/d3.v7.min.js"></script>
 <script src="https://d3js.org/topojson.v3.min.js"></script>
 
 <script>
-// State data with names and abbreviations
 const stateData = {
     "01": "AL", "02": "AK", "04": "AZ", "05": "AR", "06": "CA",
     "08": "CO", "09": "CT", "10": "DE", "11": "DC", "12": "FL",
@@ -624,586 +567,260 @@ const stateNames = {
     "WI": "Wisconsin", "WY": "Wyoming"
 };
 
-// State permit requirements
-const stateRequirements = {
-    "AL": "Alabama: Requirements to be added",
-    "AK": "Alaska: Requirements to be added",
-    "AZ": "Arizona: Requirements to be added",
-    "AR": "Arkansas: Requirements to be added",
-    "CA": "California: Requirements to be added",
-    "CO": "Colorado: Requirements to be added",
-    "CT": "Connecticut: Requirements to be added",
-    "DE": "Delaware: Requirements to be added",
-    "FL": "Florida: Requirements to be added",
-    "GA": "Georgia: Requirements to be added",
-    "HI": "Hawaii: Requirements to be added",
-    "ID": "Idaho: Requirements to be added",
-    "IL": "Illinois: Requirements to be added",
-    "IN": "Indiana: Requirements to be added",
-    "IA": "Iowa: Requirements to be added",
-    "KS": "Kansas: Requirements to be added",
-    "KY": "Kentucky: Requirements to be added",
-    "LA": "Louisiana: Requirements to be added",
-    "ME": "Maine: Requirements to be added",
-    "MD": "Maryland: Requirements to be added",
-    "MA": "Massachusetts: Requirements to be added",
-    "MI": "Michigan: Requirements to be added",
-    "MN": "Minnesota: Requirements to be added",
-    "MS": "Mississippi: Requirements to be added",
-    "MO": "Missouri: Requirements to be added",
-    "MT": "Montana: Requirements to be added",
-    "NE": "Nebraska: Requirements to be added",
-    "NV": "Nevada: Requirements to be added",
-    "NH": "New Hampshire: Requirements to be added",
-    "NJ": "New Jersey: Requirements to be added",
-    "NM": "New Mexico: Requirements to be added",
-    "NY": "New York: Requirements to be added",
-    "NC": "North Carolina: Requirements to be added",
-    "ND": "North Dakota: Requirements to be added",
-    "OH": "Ohio: Requirements to be added",
-    "OK": "Oklahoma: Requirements to be added",
-    "OR": "Oregon: Requirements to be added",
-    "PA": "Pennsylvania: Requirements to be added",
-    "RI": "Rhode Island: Requirements to be added",
-    "SC": "South Carolina: Requirements to be added",
-    "SD": "South Dakota: Requirements to be added",
-    "TN": "Tennessee: Requirements to be added",
-    "TX": "Texas: Requirements to be added",
-    "UT": "Utah: Requirements to be added",
-    "VT": "Vermont: Requirements to be added",
-    "VA": "Virginia: Requirements to be added",
-    "WA": "Washington: Requirements to be added",
-    "WV": "West Virginia: Requirements to be added",
-    "WI": "Wisconsin: Requirements to be added",
-    "WY": "Wyoming: Requirements to be added"
-};
-
-// State choices array
-const stateChoices = [
-    ['AL', 'Alabama'], ['AK', 'Alaska'], ['AZ', 'Arizona'], ['AR', 'Arkansas'],
-    ['CA', 'California'], ['CO', 'Colorado'], ['CT', 'Connecticut'], ['DE', 'Delaware'],
-    ['FL', 'Florida'], ['GA', 'Georgia'], ['HI', 'Hawaii'], ['ID', 'Idaho'],
-    ['IL', 'Illinois'], ['IN', 'Indiana'], ['IA', 'Iowa'], ['KS', 'Kansas'],
-    ['KY', 'Kentucky'], ['LA', 'Louisiana'], ['ME', 'Maine'], ['MD', 'Maryland'],
-    ['MA', 'Massachusetts'], ['MI', 'Michigan'], ['MN', 'Minnesota'], ['MS', 'Mississippi'],
-    ['MO', 'Missouri'], ['MT', 'Montana'], ['NE', 'Nebraska'], ['NV', 'Nevada'],
-    ['NH', 'New Hampshire'], ['NJ', 'New Jersey'], ['NM', 'New Mexico'], ['NY', 'New York'],
-    ['NC', 'North Carolina'], ['ND', 'North Dakota'], ['OH', 'Ohio'], ['OK', 'Oklahoma'],
-    ['OR', 'Oregon'], ['PA', 'Pennsylvania'], ['RI', 'Rhode Island'], ['SC', 'South Carolina'],
-    ['SD', 'South Dakota'], ['TN', 'Tennessee'], ['TX', 'Texas'], ['UT', 'Utah'],
-    ['VT', 'Vermont'], ['VA', 'Virginia'], ['WA', 'Washington'], ['WV', 'West Virginia'],
-    ['WI', 'Wisconsin'], ['WY', 'Wyoming']
-];
-
-// ============================================
-// UNIFIED STATE MANAGEMENT
-// ============================================
-let mapSelectedStates = [];  // Ordered array for route
-let selectedStates = new Set();  // Set for quick lookups
+const stateChoices = Object.entries(stateNames).map(([code, name]) => [code, name]);
+let mapSelectedStates = [];
+let selectedStates = new Set();
 const selectedStatesContainer = document.getElementById('selectedStates');
 
-// Toggle state selection (used by both map clicks and button clicks)
+// Enforce numbers only on inputs
+document.querySelectorAll('input[name^="axle_weight_"], input[name^="tires_per_axle_"]').forEach(input => {
+    input.addEventListener('input', function() {
+        this.value = this.value.replace(/[^0-9]/g, '');
+    });
+});
+
 function toggleStateSelection(stateCode) {
     const index = mapSelectedStates.indexOf(stateCode);
-    
     if (index > -1) {
-        // DESELECT: Remove state
         mapSelectedStates.splice(index, 1);
         selectedStates.delete(stateCode);
-        
-        // Remove the row from form
         removeStateRow(stateCode);
-        
-        // Update map appearance
-        d3.select(`.state-path[data-state="${stateCode}"]`).attr("fill", "#e9ecef");
+        d3.select('.state-path[data-state="'+stateCode+'"]').attr("fill", "#e9ecef");
     } else {
-        // SELECT: Add state
         mapSelectedStates.push(stateCode);
         selectedStates.add(stateCode);
-        
-        // Add row to form
         addStateRow(stateCode);
-        
-        // Update map appearance
-        d3.select(`.state-path[data-state="${stateCode}"]`).attr("fill", "#28a745");
+        d3.select('.state-path[data-state="'+stateCode+'"]').attr("fill", "#16a34a");
     }
-    
     updateMapRouteDisplay();
-    updateStateNumbers();
     syncStateButtons();
 }
 
-// Remove state row by state code
 function removeStateRow(stateCode) {
-    const rows = document.querySelectorAll('#selectedStates .state-row');
-    rows.forEach(row => {
-        const select = row.querySelector('select');
-        if (select && select.value === stateCode) {
-            row.remove();
-        }
+    document.querySelectorAll('#selectedStates .state-row').forEach(row => {
+        if (row.querySelector('select')?.value === stateCode) row.remove();
     });
 }
 
-// Update numbers displayed on the map
-function updateStateNumbers() {
-    if (!window.mapLabelsGroup || !window.mapPath || !window.mapUs) return;
-    
-    // Clear existing labels
-    window.mapLabelsGroup.selectAll("*").remove();
-    
-    // Add number labels for each selected state
-    const features = topojson.feature(window.mapUs, window.mapUs.objects.states).features;
-    
-    mapSelectedStates.forEach((stateCode, index) => {
-        // Find the feature for this state
-        const stateId = Object.keys(stateData).find(id => stateData[id] === stateCode);
-        const feature = features.find(f => f.id === stateId);
-        
-        if (feature) {
-            const centroid = window.mapPath.centroid(feature);
-            
-            // Add a white circle background
-            window.mapLabelsGroup.append("circle")
-                .attr("cx", centroid[0])
-                .attr("cy", centroid[1])
-                .attr("r", 14)
-                .attr("fill", "white")
-                .attr("stroke", "#28a745")
-                .attr("stroke-width", 2)
-                .style("pointer-events", "none");
-            
-            // Add the number text
-            window.mapLabelsGroup.append("text")
-                .attr("x", centroid[0])
-                .attr("y", centroid[1])
-                .attr("text-anchor", "middle")
-                .attr("dominant-baseline", "central")
-                .attr("font-size", "12px")
-                .attr("font-weight", "bold")
-                .attr("fill", "#28a745")
-                .style("pointer-events", "none")
-                .text(index + 1);
-        }
-    });
-}
-
-// Update route display
 function updateMapRouteDisplay() {
-    const routeText = mapSelectedStates.length > 0 
-        ? mapSelectedStates.map((s, i) => `${i + 1}. ${s}`).join(' → ')
-        : 'No states selected';
-    document.getElementById('routeDisplay').textContent = routeText;
+    document.getElementById('routeDisplay').textContent = mapSelectedStates.length > 0
+        ? mapSelectedStates.join(' -> ')
+        : 'None selected';
 }
 
-// Sync state buttons with current selection
 function syncStateButtons() {
     document.querySelectorAll('.state-btn').forEach(btn => {
-        const state = btn.dataset.state;
-        if (mapSelectedStates.includes(state)) {
-            btn.classList.add('selected');
-        } else {
-            btn.classList.remove('selected');
-        }
+        btn.classList.toggle('selected', mapSelectedStates.includes(btn.dataset.state));
     });
 }
 
-// Add state row to form
-function addStateRow(stateCode = '', date = '', route = '', comments = '') {
-    // Don't add duplicate rows
-    if (stateCode) {
-        const existingRows = document.querySelectorAll('#selectedStates .state-row select');
-        for (let select of existingRows) {
-            if (select.value === stateCode) {
-                return; // Row already exists
-            }
-        }
-    }
+function addStateRow(stateCode) {
+    stateCode = stateCode || '';
+    if (stateCode && [...document.querySelectorAll('#selectedStates select')].some(s => s.value === stateCode)) return;
     
     const row = document.createElement('div');
     row.className = 'state-row d-flex gap-2 align-items-center';
-    row.dataset.stateCode = stateCode;
+    row.innerHTML = '<select name="selected_states[]" class="form-select" style="width:80px;" required><option value="">--</option>' +
+        stateChoices.map(function(s) { return '<option value="'+s[0]+'" '+(s[0] === stateCode ? 'selected' : '')+'>'+s[0]+'</option>'; }).join('') +
+        '</select>' +
+        '<input type="date" name="state_date_'+stateCode+'" class="form-control" style="width:140px;" min="'+new Date().toISOString().split('T')[0]+'">' +
+        '<input type="text" name="state_route_'+stateCode+'" class="form-control" style="flex:1;" placeholder="Route">' +
+        '<input type="text" name="state_comments_'+stateCode+'" class="form-control" style="flex:1;" placeholder="Comments">' +
+        '<button type="button" class="btn btn-sm btn-outline-danger remove-state"><i class="bi bi-x-lg"></i></button>';
     
-    row.innerHTML = `
-        <select name="selected_states[]" class="form-select form-select-sm" style="width: 80px;" required>
-            <option value="">--</option>
-            ${stateChoices.map(([code, name]) =>
-                `<option value="${code}" ${code === stateCode ? 'selected' : ''}>${code}</option>`
-            ).join('')}
-        </select>
-        <input type="date" name="state_date_${stateCode}" class="form-control form-control-sm" style="width: 140px;" value="${date || ''}" placeholder="Date" min="${new Date().toISOString().split('T')[0]}">
-        <input type="text" name="state_route_${stateCode}" class="form-control form-control-sm" style="flex: 1;" value="${route}" placeholder="Route">
-        <input type="text" name="state_comments_${stateCode}" class="form-control form-control-sm" style="flex: 1;" value="${comments}" placeholder="Comments">
-        <button type="button" class="btn btn-sm btn-outline-danger remove-state"><i class="bi bi-x"></i></button>
-    `;
-
-    // Remove button handler - syncs with map
-    row.querySelector('.remove-state').addEventListener('click', () => {
-        const select = row.querySelector('select');
-        const stateToRemove = select.value;
-        
-        if (stateToRemove) {
-            // Remove from tracking arrays
-            const mapIndex = mapSelectedStates.indexOf(stateToRemove);
-            if (mapIndex > -1) {
-                mapSelectedStates.splice(mapIndex, 1);
-            }
-            selectedStates.delete(stateToRemove);
-            
-            // Update map appearance
-            d3.select(`.state-path[data-state="${stateToRemove}"]`).attr("fill", "#e9ecef");
-            
-            // Update button
-            document.querySelector(`.state-btn[data-state="${stateToRemove}"]`)?.classList.remove('selected');
+    row.querySelector('.remove-state').addEventListener('click', function() {
+        var state = row.querySelector('select').value;
+        if (state) {
+            mapSelectedStates = mapSelectedStates.filter(function(s) { return s !== state; });
+            selectedStates.delete(state);
+            d3.select('.state-path[data-state="'+state+'"]').attr("fill", "#e9ecef");
+            syncStateButtons();
+            updateMapRouteDisplay();
         }
-        
         row.remove();
-        updateMapRouteDisplay();
-        updateStateNumbers();
     });
-
-    // Dropdown change handler - syncs with map
+    
     row.querySelector('select').addEventListener('change', function() {
-        const oldState = row.dataset.stateCode;
-        const newState = this.value;
-        
-        // Remove old state from tracking
-        if (oldState) {
-            const oldIndex = mapSelectedStates.indexOf(oldState);
-            if (oldIndex > -1) {
-                mapSelectedStates.splice(oldIndex, 1);
-            }
-            selectedStates.delete(oldState);
-            d3.select(`.state-path[data-state="${oldState}"]`).attr("fill", "#e9ecef");
-            document.querySelector(`.state-btn[data-state="${oldState}"]`)?.classList.remove('selected');
-        }
-        
-        // Add new state to tracking
-        if (newState && !mapSelectedStates.includes(newState)) {
-            mapSelectedStates.push(newState);
-            selectedStates.add(newState);
-            d3.select(`.state-path[data-state="${newState}"]`).attr("fill", "#28a745");
-            document.querySelector(`.state-btn[data-state="${newState}"]`)?.classList.add('selected');
-        }
-        
-        // Update row data attribute and input names
-        row.dataset.stateCode = newState;
-        row.querySelector('input[type="date"]').name = `state_date_${newState}`;
-        row.querySelectorAll('input[type="text"]')[0].name = `state_route_${newState}`;
-        row.querySelectorAll('input[type="text"]')[1].name = `state_comments_${newState}`;
-        
-        updateMapRouteDisplay();
-        updateStateNumbers();
+        var newState = this.value;
+        var inputs = row.querySelectorAll('input');
+        inputs[0].name = 'state_date_' + newState;
+        inputs[1].name = 'state_route_' + newState;
+        inputs[2].name = 'state_comments_' + newState;
     });
-
+    
     selectedStatesContainer.appendChild(row);
-
-    if (stateCode) {
-        selectedStates.add(stateCode);
-        document.querySelector(`.state-btn[data-state="${stateCode}"]`)?.classList.add('selected');
-    }
+    if (stateCode) selectedStates.add(stateCode);
 }
 
-// ============================================
-// MAP INITIALIZATION
-// ============================================
-// ============================================
-// MAP INITIALIZATION
-// ============================================
+// Map
 d3.json("https://cdn.jsdelivr.net/npm/us-atlas@3/states-albers-10m.json").then(function(us) {
-    console.log("Map data loaded:", us);
-    const width = 975;
-    const height = 610;
-
-    const svg = d3.select("#us-map")
-        .append("svg")
-        .attr("viewBox", [0, 0, width, height])
+    var svg = d3.select("#us-map").append("svg")
+        .attr("viewBox", [0, 0, 975, 610])
         .attr("width", "100%")
-        .attr("height", "100%")
-        .style("max-width", "900px")
-        .style("display", "block")
-        .style("margin", "0 auto")
-        .style("background", "#f8f9fa");
-
-    const path = d3.geoPath();
-    const tooltip = d3.select("#mapTooltip");
+        .style("max-height", "550px");
     
-    // Create a group for states
-    const statesGroup = svg.append("g").attr("class", "states-group");
+    var path = d3.geoPath();
+    var tooltip = d3.select("#mapTooltip");
     
-    // Create a group for state abbreviation labels
-    const stateLabelsGroup = svg.append("g").attr("class", "state-labels-group");
-    
-    // Create a group for selection number labels - renders on top
-    const labelsGroup = svg.append("g").attr("class", "labels-group");
-    
-    // Draw state paths
-    statesGroup.selectAll("path")
+    svg.selectAll("path")
         .data(topojson.feature(us, us.objects.states).features)
-        .enter()
-        .append("path")
+        .enter().append("path")
         .attr("d", path)
         .attr("fill", "#e9ecef")
         .attr("stroke", "#fff")
-        .attr("stroke-width", 1.5)
-        .attr("data-state", d => stateData[d.id] || "")
-        .attr("data-id", d => d.id)
+        .attr("stroke-width", 1)
+        .attr("data-state", function(d) { return stateData[d.id] || ""; })
         .attr("class", "state-path")
         .style("cursor", "pointer")
-        .on("mouseover", function(event, d) {
-            const stateCode = stateData[d.id];
-            if (stateCode) {
-                d3.select(this).attr("fill", mapSelectedStates.includes(stateCode) ? "#1e7e34" : "#007bff");
-                const requirement = stateRequirements[stateCode] || "Requirements to be added";
-                tooltip.style("display", "block")
-                    .html(`<strong>${stateNames[stateCode]}</strong><br>${requirement}`)
-                    .style("left", (event.pageX + 10) + "px")
-                    .style("top", (event.pageY - 10) + "px");
+        .on("mouseover", function(e, d) {
+            var code = stateData[d.id];
+            if (code) {
+                d3.select(this).attr("fill", mapSelectedStates.includes(code) ? "#15803d" : "#0284c7");
+                tooltip.style("display", "block").html("<strong>"+stateNames[code]+"</strong>")
+                    .style("left", (e.pageX + 10) + "px").style("top", (e.pageY - 10) + "px");
             }
         })
-        .on("mouseout", function(event, d) {
-            const stateCode = stateData[d.id];
-            if (stateCode) {
-                d3.select(this).attr("fill", mapSelectedStates.includes(stateCode) ? "#28a745" : "#e9ecef");
+        .on("mouseout", function(e, d) {
+            var code = stateData[d.id];
+            if (code) {
+                d3.select(this).attr("fill", mapSelectedStates.includes(code) ? "#16a34a" : "#e9ecef");
                 tooltip.style("display", "none");
             }
         })
-        .on("click", function(event, d) {
-            const stateCode = stateData[d.id];
-            if (stateCode) {
-                toggleStateSelection(stateCode);
-            }
+        .on("click", function(e, d) {
+            var code = stateData[d.id];
+            if (code) toggleStateSelection(code);
         });
-    
-    // Add state borders
-    svg.append("path")
-        .datum(topojson.mesh(us, us.objects.states, (a, b) => a !== b))
-        .attr("fill", "none")
-        .attr("stroke", "#fff")
-        .attr("stroke-linejoin", "round")
-        .attr("d", path);
-    
-    // Add state abbreviation labels
-    const features = topojson.feature(us, us.objects.states).features;
-    
-    features.forEach(feature => {
-        const stateCode = stateData[feature.id];
-        if (stateCode) {
-            const centroid = path.centroid(feature);
-            
-            // Skip if centroid is invalid
-            if (isNaN(centroid[0]) || isNaN(centroid[1])) return;
-            
-            stateLabelsGroup.append("text")
-                .attr("x", centroid[0])
-                .attr("y", centroid[1])
-                .attr("text-anchor", "middle")
-                .attr("dominant-baseline", "central")
-                .attr("font-size", "10px")
-                .attr("font-weight", "600")
-                .attr("fill", "#555")
-                .attr("pointer-events", "none")
-                .attr("class", "state-abbr-label")
-                .attr("data-state", stateCode)
-                .text(stateCode);
-        }
-    });
-        
-    // Store references globally for updating selection numbers
-    window.mapLabelsGroup = labelsGroup;
-    window.mapStateLabelsGroup = stateLabelsGroup;
-    window.mapPath = path;
-    window.mapUs = us;
-        
-}).catch(function(error) {
-    console.error("Error loading map:", error);
-    document.getElementById("us-map").innerHTML = '<p class="text-muted text-center">Map could not be loaded. Please use the state buttons below.</p>';
+}).catch(function() {
+    document.getElementById("us-map").innerHTML = '<p class="text-muted text-center py-4">Map unavailable</p>';
 });
 
-// ============================================
-// EVENT HANDLERS
-// ============================================
-
-// State button click handler
-document.querySelectorAll('.state-btn').forEach(btn => {
-    btn.addEventListener('click', function() {
-        const state = this.dataset.state;
-        toggleStateSelection(state);
-    });
+// Event handlers
+document.querySelectorAll('.state-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() { toggleStateSelection(btn.dataset.state); });
 });
 
-// Add State Row button (manual add)
-document.getElementById('addStateBtn').addEventListener('click', () => {
-    addStateRow('');
-});
+document.getElementById('addStateBtn').addEventListener('click', function() { addStateRow(''); });
 
-// Clear Route button
-document.getElementById('clearMapBtn')?.addEventListener('click', function() {
+document.getElementById('clearMapBtn').addEventListener('click', function() {
     mapSelectedStates = [];
     selectedStates.clear();
     d3.selectAll('.state-path').attr('fill', '#e9ecef');
     updateMapRouteDisplay();
-    updateStateNumbers();
     syncStateButtons();
-    document.getElementById('selectedStates').innerHTML = '';
+    selectedStatesContainer.innerHTML = '';
 });
 
-// Update driver email when driver changes
-document.getElementById('id_driver')?.addEventListener('change', function() {
-    const selectedOption = this.options[this.selectedIndex];
-    const email = selectedOption.dataset.email || '-';
-    document.getElementById('driverEmail').value = email;
-});
-
-// Trigger on page load if driver is pre-selected
-document.addEventListener('DOMContentLoaded', function() {
-    const driverSelect = document.getElementById('id_driver');
-    if (driverSelect && driverSelect.value) {
-        driverSelect.dispatchEvent(new Event('change'));
-    }
-});
-
-// ============================================
-// GROSS WEIGHT CALCULATION
-// ============================================
-function calculateGrossWeight() {
-    let total = 0;
-    for (let i = 1; i <= 9; i++) {
-        const axleWeight = parseInt(document.querySelector(`input[name="axle_weight_${i}"]`)?.value || 0);
-        total += axleWeight;
-    }
-    const grossWeightInput = document.getElementById('id_gross_weight');
-    if (grossWeightInput) {
-        grossWeightInput.value = total;
-    }
-}
-
-// Add event listeners to all axle weight inputs
-for (let i = 1; i <= 9; i++) {
-    const input = document.querySelector(`input[name="axle_weight_${i}"]`);
-    if (input) {
-        input.addEventListener('input', calculateGrossWeight);
-    }
-}
-
-// ============================================
-// EQUIPMENT COMBINATION SELECTOR
-// ============================================
-const combinationSelector = document.getElementById('combinationSelector');
-if (combinationSelector) {
-    combinationSelector.addEventListener('change', function() {
-        const selectedOption = this.options[this.selectedIndex];
-        
-        if (this.value) {
-            const driverId = selectedOption.dataset.driver;
-            const truckId = selectedOption.dataset.truck;
-            const trailerId = selectedOption.dataset.trailer;
-            const spacing12ft = selectedOption.getAttribute('data-spacing-1-2-ft');
-            const spacing12in = selectedOption.getAttribute('data-spacing-1-2-in');
-            const spacing23ft = selectedOption.getAttribute('data-spacing-2-3-ft');
-            const spacing23in = selectedOption.getAttribute('data-spacing-2-3-in');
-            const spacing34ft = selectedOption.getAttribute('data-spacing-3-4-ft');
-            const spacing34in = selectedOption.getAttribute('data-spacing-3-4-in');
-            const spacing45ft = selectedOption.getAttribute('data-spacing-4-5-ft');
-            const spacing45in = selectedOption.getAttribute('data-spacing-4-5-in');
-            const spacing56ft = selectedOption.getAttribute('data-spacing-5-6-ft');
-            const spacing56in = selectedOption.getAttribute('data-spacing-5-6-in');
-            const spacing67ft = selectedOption.getAttribute('data-spacing-6-7-ft');
-            const spacing67in = selectedOption.getAttribute('data-spacing-6-7-in');
-            const spacing78ft = selectedOption.getAttribute('data-spacing-7-8-ft');
-            const spacing78in = selectedOption.getAttribute('data-spacing-7-8-in');
-            const spacing89ft = selectedOption.getAttribute('data-spacing-8-9-ft');
-            const spacing89in = selectedOption.getAttribute('data-spacing-8-9-in');
-            const numAxles = selectedOption.getAttribute('data-num-axles');
-
-            if (driverId) {
-                document.getElementById('id_driver').value = driverId;
-                document.getElementById('id_driver').dispatchEvent(new Event('change'));
-            }
-            if (truckId) {
-                document.getElementById('id_truck').value = truckId;
-            }
-            if (trailerId) {
-                document.getElementById('id_trailer').value = trailerId;
-            }
-            
-            // Auto-fill axle spacings
-            if (numAxles) {
-                const numAxlesInput = document.querySelector('input[name="num_axles"]');
-                if (numAxlesInput) numAxlesInput.value = numAxles;
-            }
-            if (spacing12ft) document.querySelector('input[name="spacing_1_2_ft"]').value = spacing12ft;
-            if (spacing12in) document.querySelector('input[name="spacing_1_2_in"]').value = spacing12in;
-            if (spacing23ft) document.querySelector('input[name="spacing_2_3_ft"]').value = spacing23ft;
-            if (spacing23in) document.querySelector('input[name="spacing_2_3_in"]').value = spacing23in;
-            if (spacing34ft) document.querySelector('input[name="spacing_3_4_ft"]').value = spacing34ft;
-            if (spacing34in) document.querySelector('input[name="spacing_3_4_in"]').value = spacing34in;
-            if (spacing45ft) document.querySelector('input[name="spacing_4_5_ft"]').value = spacing45ft;
-            if (spacing45in) document.querySelector('input[name="spacing_4_5_in"]').value = spacing45in;
-            if (spacing56ft) document.querySelector('input[name="spacing_5_6_ft"]').value = spacing56ft;
-            if (spacing56in) document.querySelector('input[name="spacing_5_6_in"]').value = spacing56in;
-            if (spacing67ft) document.querySelector('input[name="spacing_6_7_ft"]').value = spacing67ft;
-            if (spacing67in) document.querySelector('input[name="spacing_6_7_in"]').value = spacing67in;
-            if (spacing78ft) document.querySelector('input[name="spacing_7_8_ft"]').value = spacing78ft;
-            if (spacing78in) document.querySelector('input[name="spacing_7_8_in"]').value = spacing78in;
-            if (spacing89ft) document.querySelector('input[name="spacing_8_9_ft"]').value = spacing89ft;
-            if (spacing89in) document.querySelector('input[name="spacing_8_9_in"]').value = spacing89in;
-
-            // Auto-fill kingpin to rear axle
-            const kingpinFt = selectedOption.getAttribute('data-kingpin-ft');
-            const kingpinIn = selectedOption.getAttribute('data-kingpin-in');
-            if (kingpinFt) document.querySelector('input[name="kingpin_to_rear_ft"]').value = kingpinFt;
-            if (kingpinIn) document.querySelector('input[name="kingpin_to_rear_in"]').value = kingpinIn;
-        }
-        else {
-            document.getElementById('id_driver').value = '';
-            document.getElementById('id_truck').value = '';
-            document.getElementById('id_trailer').value = '';
-            document.getElementById('driverEmail').value = '-';
-        }
-    });
-}
-// Legal weight checkbox auto-fill
-document.getElementById('id_is_legal_weight')?.addEventListener('change', function() {
-    if (this.checked) {
-        // Auto-fill axle weights for legal weight
-        document.querySelector('input[name="axle_weight_1"]').value = 12000;
-        document.querySelector('input[name="axle_weight_2"]').value = 17000;
-        document.querySelector('input[name="axle_weight_3"]').value = 17000;
-        document.querySelector('input[name="axle_weight_4"]').value = 17000;
-        document.querySelector('input[name="axle_weight_5"]').value = 17000;
-        
-        // Clear remaining axles
-        document.querySelector('input[name="axle_weight_6"]').value = '';
-        document.querySelector('input[name="axle_weight_7"]').value = '';
-        document.querySelector('input[name="axle_weight_8"]').value = '';
-        document.querySelector('input[name="axle_weight_9"]').value = '';
-        
-        // Set gross weight
-        document.getElementById('id_gross_weight').value = 80000;
-    }
-});
-// Sync driver selection to hidden field
-document.getElementById('id_driver')?.addEventListener('change', function() {
+// Driver info
+document.getElementById('id_driver').addEventListener('change', function() {
+    var opt = this.options[this.selectedIndex];
+    var email = opt ? (opt.dataset.email || '-') : '-';
+    var phone = opt ? (opt.dataset.phone || '-') : '-';
+    document.getElementById('driverInfo').innerHTML = this.value ? '<strong>Email:</strong> '+email+' | <strong>Phone:</strong> '+phone : '-';
     document.getElementById('hidden_driver').value = this.value;
 });
 
-// Also sync on page load
-document.addEventListener('DOMContentLoaded', function() {
-    const driverSelect = document.getElementById('id_driver');
-    const hiddenDriver = document.getElementById('hidden_driver');
-    if (driverSelect && hiddenDriver) {
-        hiddenDriver.value = driverSelect.value;
+// Gross weight calc
+function calcGross() {
+    var total = 0;
+    for (var i = 1; i <= 9; i++) {
+        var inp = document.querySelector('input[name="axle_weight_'+i+'"]');
+        total += parseInt(inp ? inp.value : 0) || 0;
     }
-});
+    document.getElementById('id_gross_weight').value = total;
+}
 
-// Update hidden field when combination is selected
-const existingCombinationHandler = document.getElementById('combinationSelector');
-if (existingCombinationHandler) {
-    existingCombinationHandler.addEventListener('change', function() {
-        setTimeout(() => {
-            document.getElementById('hidden_driver').value = document.getElementById('id_driver').value;
-        }, 100);
+for (var i = 1; i <= 9; i++) {
+    var inp = document.querySelector('input[name="axle_weight_'+i+'"]');
+    if (inp) inp.addEventListener('input', calcGross);
+}
+
+// Legal weight
+var legalWt = document.getElementById('id_is_legal_weight');
+if (legalWt) {
+    legalWt.addEventListener('change', function() {
+        if (this.checked) {
+            var weights = [12000, 17000, 17000, 17000, 17000, '', '', '', ''];
+            for (var i = 0; i < 9; i++) {
+                document.querySelector('input[name="axle_weight_'+(i+1)+'"]').value = weights[i];
+            }
+            document.getElementById('id_gross_weight').value = 80000;
+        }
     });
 }
+
+// Combination selector
+var comboSelector = document.getElementById('combinationSelector');
+if (comboSelector) {
+    comboSelector.addEventListener('change', function() {
+        var opt = this.options[this.selectedIndex];
+        if (!this.value) return;
+        
+        // Driver
+        var driverId = opt.dataset.driver;
+        if (driverId) {
+            document.getElementById('id_driver').value = driverId;
+            document.getElementById('id_driver').dispatchEvent(new Event('change'));
+            document.getElementById('hidden_driver').value = driverId;
+            var dEmail = opt.dataset.driverEmail || '-';
+            var dPhone = opt.dataset.driverPhone || '-';
+            document.getElementById('driverInfo').innerHTML = '<strong>Email:</strong> '+dEmail+' | <strong>Phone:</strong> '+dPhone;
+        }
+        
+        // Truck
+        var truckId = opt.dataset.truck;
+        if (truckId) {
+            document.getElementById('id_truck').value = truckId;
+            var tUnit = opt.dataset.truckUnit || '';
+            var tYear = opt.dataset.truckYear || '';
+            var tMake = opt.dataset.truckMake || '';
+            var tPlate = opt.dataset.truckPlate || '';
+            var tPlateState = opt.dataset.truckPlateState || '';
+            document.getElementById('truckInfo').innerHTML = tUnit ? '<strong>'+tUnit+'</strong> '+tYear+' '+tMake+' | Plate: '+tPlate+' '+tPlateState : '-';
+        }
+        
+        // Trailer
+        var trailerId = opt.dataset.trailer;
+        if (trailerId) {
+            document.getElementById('id_trailer').value = trailerId;
+            var trUnit = opt.dataset.trailerUnit || '';
+            var trYear = opt.dataset.trailerYear || '';
+            var trMake = opt.dataset.trailerMake || '';
+            var trPlate = opt.dataset.trailerPlate || '';
+            var trPlateState = opt.dataset.trailerPlateState || '';
+            document.getElementById('trailerInfo').innerHTML = trUnit ? '<strong>'+trUnit+'</strong> '+trYear+' '+trMake+' | Plate: '+trPlate+' '+trPlateState : '-';
+        }
+        
+        // Axles
+        var numAxles = opt.getAttribute('data-num-axles');
+        if (numAxles) {
+            var axleInput = document.querySelector('input[name="num_axles"]') || document.getElementById('id_num_axles');
+            if (axleInput) axleInput.value = numAxles;
+        }
+        
+        // Spacings
+        ['1_2','2_3','3_4','4_5','5_6','6_7','7_8','8_9'].forEach(function(s) {
+            var ft = opt.getAttribute('data-spacing-'+s.replace('_','-')+'-ft');
+            var inch = opt.getAttribute('data-spacing-'+s.replace('_','-')+'-in');
+            if (ft) { var el = document.querySelector('input[name="spacing_'+s+'_ft"]'); if(el) el.value = ft; }
+            if (inch) { var el = document.querySelector('input[name="spacing_'+s+'_in"]'); if(el) el.value = inch; }
+        });
+        
+        // Kingpin
+        var kft = opt.getAttribute('data-kingpin-ft');
+        var kin = opt.getAttribute('data-kingpin-in');
+        if (kft) { var el = document.querySelector('input[name="kingpin_to_rear_ft"]'); if(el) el.value = kft; }
+        if (kin) { var el = document.querySelector('input[name="kingpin_to_rear_in"]'); if(el) el.value = kin; }
+    });
+}
+
+// Init
+document.addEventListener('DOMContentLoaded', function() {
+    var driver = document.getElementById('id_driver');
+    if (driver && driver.value) driver.dispatchEvent(new Event('change'));
+    
+    var combo = document.getElementById('combinationSelector');
+    if (combo && combo.value) combo.dispatchEvent(new Event('change'));
+});
 </script>
 {% endblock %}
